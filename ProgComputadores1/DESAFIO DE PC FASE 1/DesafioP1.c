@@ -52,13 +52,13 @@ typedef struct // Diz ao Compilador como a estrutura Tarefa é
 
 void exibirMenu();
 
-void inserirTarefa(Tarefa *tarefas[50], int ocupadas, Tarefa tarefa, );
-void buscarTarefa(int tarefas[50], int indice);
+void inserirTarefa(Tarefa *tarefas[], int ocupadas, Tarefa tarefa);
+void buscarTarefa(Tarefa tarefas[], int indice);
 void listarTarefas(Tarefa tarefas[], int ocupadas);
-void editarTarefa(int *tarefas[50], );
-void excluirTarefa(int *tarefas[50], char nome);
+void editarTarefa(Tarefa *tarefa);
+void excluirTarefa(Tarefa *tarefas[], int ocupadas, int indice);
 
-void lerInput(char palavra[100], int tamanho);
+void lerInput(char *palavra[], int tamanho);
 
 int livre(void);
 
@@ -74,40 +74,58 @@ int main()
     while (choice != 6)
     {
         exibirMenu();
-        scanf("%d", &choice);
-
-        swtich(choice)
+        scanf("%d\n", &choice);
+        /*
+1. Inserir tarefa 2. Buscar tarefa  3. Listar tarefas
+4. Editar tarefa  5. Excluir tarefa 6. Sair do programa
+*/
+        switch (choice)
         {
         case 1:
+        {
             Tarefa novaTarefa = criarTarefa();
 
-            inserirTarefa(tarefas, tarefa);
+            inserirTarefa(tarefas, ocupados, novaTarefa);
             break;
+        }
         case 2:
+        {
             char nome[50];
             lerInput(*nome, 50);
-            Tarefa tarefa;
-            buscarTarefa(tarefas, tarefa, ocupados);
-            break;
-        case 3:
-            listarTarefas(tarefas, ocupados);
-            break;
-        case 4:
-            char nome;
-            lerInput(nome, 50);
             int indice = encontrarIndice(tarefas, ocupados, nome);
-            Tarefa tarefa = buscarTarefa(tarefa, indice);
-            editarTarefa(*tarefas, *tarefa);
+            Tarefa tarefa = buscarTarefa(tarefas, indice);
+
             imprimirTarefa(tarefa);
             break;
-        case 5:
-            char nome[50];
+        }
+        case 3:
+        {
+            listarTarefas(tarefas, ocupados);
+            break;
+        }
+        case 4:
+        {
+            char *nome[50];
             lerInput(nome, 50);
             int indice = encontrarIndice(tarefas, ocupados, nome);
-            Tarefa tarefa = buscarTarefa(tarefa, indice);
+            if (indice == -1)
+                printf("Tente novamente");
+            Tarefa tarefa = buscarTarefa(tarefas, indice);
 
-            excluirTarefa(tarefas, tarefa);
+            editarTarefa(&tarefa);
+            imprimirTarefa(tarefa);
             break;
+        }
+        case 5:
+        {
+            char *nome[50];
+            lerInput(*nome, 50);
+
+            int indice = encontrarIndice(tarefas, ocupados, &nome);
+
+            excluirTarefa(tarefas, ocupados, indice);
+            break;
+        }
         default:
             printf("Opção Inválida, digite novamente\n");
         }
@@ -116,15 +134,7 @@ int main()
     return 0;
 }
 
-int espacoLivre(Tarefa tarefas[])
-{
-    int aux;
-    for (int i = 0; tarefas[i].nome[] && i < MAX_SIZE; i++)
-    {
-        (i == MAX_SIZE) ? return -1 : return i;
-    }
-}
-void lerInput(char *palavra, int tamanho)
+void lerInput(char *palavra[], int tamanho)
 {
     int i = 0;
     char nome[tamanho];
@@ -137,6 +147,7 @@ void lerInput(char *palavra, int tamanho)
     };
 
     nome[i] = '\0';
+    *palavra = nome;
 }
 
 void exibirMenu(void)
@@ -172,31 +183,31 @@ Tarefa criarTarefa(void)
 
     return novaTarefa;
 }
-void inserirTarefa(Tarefa tarefas[], int *utilizadas, Tarefa novaTarefa)
+void inserirTarefa(Tarefa tarefas[], int *ocupados, Tarefa novaTarefa)
 {
     printf("Digite os campos da nova Tarefa");
 
-    int livre = espacoLivre(tarefas);
-    if (utilizadas == sizeof(tarefas))
+    if (ocupados == sizeof(tarefas))
     {
         printf("A Lista está cheia!. Delete um item para esvaziar");
         return;
     }
 
-    tarefas[*utilizadas++] = novaTarefa;
+    tarefas[*ocupados++] = novaTarefa;
 
     printf("Tarefa Inserida com sucesso");
 }
 
 // Recebe nome, procura tarefa.nome == nome, retorna tarefa
-void buscarTarefa(Tarefa tarefas, int indice)
+Tarefa buscarTarefa(Tarefa tarefas, int indice)
 {
     if (indice == -1)
     {
         printf("Tarefa não encontrada ou não existe.");
         return;
     }
-    tarefa = &tarefas[indice];
+
+    return &tarefas[indice];
 }
 
 void listarTarefas(Tarefa tarefas[], int ocupadas)
@@ -207,7 +218,7 @@ void listarTarefas(Tarefa tarefas[], int ocupadas)
     }
 }
 
-void editarTarefa(int *tarefas[], Tarefa tarefa)
+void editarTarefa(Tarefa *tarefa)
 {
     int choice = 0;
 
@@ -223,36 +234,37 @@ void editarTarefa(int *tarefas[], Tarefa tarefa)
     {
     case 1:
         printf("Digite o novo nome: ");
-        tarefa.nome = lerInput(tarefa.nome);
+        lerInput(*tarefa->nome, sizeof(tarefa->nome));
         break;
     case 2:
         printf("Digite a nova descrição: ");
-        tarefa.descricao = lerInput(tarefa.descricao);
+        lerInput(*tarefa->descricao, sizeof(tarefa->nome));
         break;
     case 3:
         printf("Digite a nova data: ");
-        tarefa.data = lerInput(tarefa.data);
+        lerInput(*tarefa->data, sizeof(tarefa->data));
         break;
     case 4:
         printf("Digite a nova categoria: ");
-        tarefa.categoria = lerInput(tarefa.categoria);
+        lerInput(*tarefa->categoria, sizeof(tarefa->categoria));
         break;
     case 5:
         printf("Digite a nova prioridade: ");
-        tarefa.prioridade = scanf("%d", &tarefa.prioridade);
+        scanf("%d", &tarefa->prioridade);
     }
 }
 
-void excluirTarefa(int *tarefas[50], int ocupadas, int indiceAlvo)
+void excluirTarefa(Tarefa *tarefas[], int ocupadas, int indiceAlvo)
 {
 
     for (int i = 0; i < ocupadas; i++)
     {
-        tarefas[indiceAlvo].nome = "\0";
-        tarefas[indiceAlvo].descricao = "\0";
-        tarefas[indiceAlvo].data = "\0";
-        tarefas[indiceAlvo].prioridade = "\0";
-        tarefas[indiceAlvo].categoria = "\0";
+        // Lembrete: para acessar campos de ponteiros, utilize flechas ao invés de '.'.
+        *tarefas[indiceAlvo]->nome = "\0";
+        *tarefas[indiceAlvo]->descricao = "\0";
+        *tarefas[indiceAlvo]->data = "\0";
+        *tarefas[indiceAlvo]->prioridade = 0;
+        *tarefas[indiceAlvo]->categoria = "\0";
     };
 
     printf("Tarefa Excluida.");
