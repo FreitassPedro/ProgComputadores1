@@ -52,8 +52,8 @@ typedef struct // Diz ao Compilador como a estrutura Tarefa é
 
 void exibirMenu();
 
-void inserirTarefa(Tarefa *tarefas[], int ocupadas, Tarefa tarefa);
-void buscarTarefa(Tarefa tarefas[], int indice);
+void inserirTarefa(Tarefa *tarefas[], int *ocupadas, Tarefa tarefa);
+Tarefa buscarTarefa(Tarefa tarefas[], int indice);
 void listarTarefas(Tarefa tarefas[], int ocupadas);
 void editarTarefa(Tarefa *tarefa);
 void excluirTarefa(Tarefa *tarefas[], int ocupadas, int indice);
@@ -105,7 +105,7 @@ int main()
         }
         case 4:
         {
-            char *nome[50];
+            char nome[50];
             lerInput(nome, 50);
             int indice = encontrarIndice(tarefas, ocupados, nome);
             if (indice == -1)
@@ -183,7 +183,7 @@ Tarefa criarTarefa(void)
 
     return novaTarefa;
 }
-void inserirTarefa(Tarefa tarefas[], int *ocupados, Tarefa novaTarefa)
+void inserirTarefa(Tarefa *tarefas[], int *ocupados, Tarefa novaTarefa)
 {
     printf("Digite os campos da nova Tarefa");
 
@@ -193,21 +193,16 @@ void inserirTarefa(Tarefa tarefas[], int *ocupados, Tarefa novaTarefa)
         return;
     }
 
-    tarefas[*ocupados++] = novaTarefa;
+    // Aponta para o endereço da novaTarefa
+    tarefas[*ocupados++] = &novaTarefa;
 
     printf("Tarefa Inserida com sucesso");
 }
 
-// Recebe nome, procura tarefa.nome == nome, retorna tarefa
-Tarefa buscarTarefa(Tarefa tarefas, int indice)
+// Assume-se que o indice foi encontrado!
+Tarefa buscarTarefa(Tarefa tarefas[], int indice)
 {
-    if (indice == -1)
-    {
-        printf("Tarefa não encontrada ou não existe.");
-        return;
-    }
-
-    return &tarefas[indice];
+    return tarefas[indice];
 }
 
 void listarTarefas(Tarefa tarefas[], int ocupadas)
@@ -292,7 +287,8 @@ int encontrarIndice(Tarefa tarefas[], int ocupadas, char nome)
 {
     for (int i = 0; i < ocupadas; i++)
     {
-        if (str(tarefas[i], nome))
+        // o Strcmp compara valores de String em C
+        if (strcmp(tarefas[i].nome, nome))
             return i;
     }
     return -1;
