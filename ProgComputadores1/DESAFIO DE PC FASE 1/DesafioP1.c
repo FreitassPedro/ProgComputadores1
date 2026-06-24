@@ -53,7 +53,7 @@ typedef struct // Diz ao Compilador como a estrutura Tarefa é
 void exibirMenu();
 
 void inserirTarefa(Tarefa *tarefas[50], int ocupadas, Tarefa tarefa, );
-void buscarTarefa(int tarefas[50], char nome, Tarefa *tarefa);
+void buscarTarefa(int tarefas[50], int indice);
 void listarTarefas(Tarefa tarefas[], int ocupadas);
 void editarTarefa(int *tarefas[50], );
 void excluirTarefa(int *tarefas[50], char nome);
@@ -243,12 +243,27 @@ void editarTarefa(int *tarefas[], Tarefa tarefa)
     }
 }
 
-void excluirTarefa(int *tarefas[50], int indice)
+void excluirTarefa(int *tarefas[50], int ocupadas, int indiceAlvo)
 {
 
+    for (int i = 0; i < ocupadas; i++)
+    {
+        tarefas[indiceAlvo].nome = "\0";
+        tarefas[indiceAlvo].descricao = "\0";
+        tarefas[indiceAlvo].data = "\0";
+        tarefas[indiceAlvo].prioridade = "\0";
+        tarefas[indiceAlvo].categoria = "\0";
+    };
 
+    printf("Tarefa Excluida.");
 
+    printf("Reorgaizando a lista...");
+    for (int i = indiceAlvo; i < ocupadas; i++)
+    {
+        tarefas[i + 1] = tarefas[i];
+    };
 
+    printf("Lista reorganizada");
 }
 
 void imprimirTarefa(Tarefa tarefa)
