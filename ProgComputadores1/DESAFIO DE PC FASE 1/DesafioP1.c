@@ -50,21 +50,28 @@ typedef struct // Diz ao Compilador como a estrutura Tarefa é
 
 void exibirMenu();
 
-void inserirTarefa(Tarefa *tarefas[], int *ocupadas, Tarefa tarefa);
+void inserirTarefa(Tarefa tarefas[], int *ocupadas, int tamanho, Tarefa novaTarefa);
 Tarefa buscarTarefa(Tarefa tarefas[], int indice);
 void listarTarefas(Tarefa tarefas[], int ocupadas);
-void editarTarefa(Tarefa *tarefa);
-void excluirTarefa(Tarefa tarefas[], int ocupadas, int indice);
+void editarTarefa(Tarefa tarefas[], int indice);
+void excluirTarefa(Tarefa tarefas[], int *ocupadas, int indice);
+Tarefa criarTarefa(void);
 
-void lerInput(char *palavra[], int tamanho);
+void lerInput(char *palavra, int tamanho);
+int encontrarIndice(Tarefa tarefas[], int tamanho, char nome[]);
 
+void imprimirTarefa(Tarefa tarefa);
 int livre(void);
 
+/*Anotações
+- em C, passar listas em parametros na verdade é passar o ponteiro para primeiro elemento. Se quiser manipular uma cópia, teria que criar uma.
+- coleção de char ("Ex char nome[]") funciona como ponteiros. Utilizar *nome passa indice 0 do char, assim, *nome == nome[0].
+*/
 int main()
 {
 
     int tamanho = 50;
-    int ocupados = 0;
+    int ocupadas = 0;
     Tarefa tarefas[tamanho];
 
     int choice = 0;
@@ -73,55 +80,53 @@ int main()
     {
         exibirMenu();
         scanf("%d\n", &choice);
-        /*
-1. Inserir tarefa 2. Buscar tarefa  3. Listar tarefas
-4. Editar tarefa  5. Excluir tarefa 6. Sair do programa
-*/
+
         switch (choice)
         {
-        case 1:
+
+        case 1: // 1. Inserir Tarefa
         {
             Tarefa novaTarefa = criarTarefa();
 
-            inserirTarefa(tarefas, ocupados, novaTarefa);
+            inserirTarefa(tarefas, &ocupadas, tamanho, novaTarefa);
             break;
         }
-        case 2:
+        case 2: // 2. Buscar tarefa
         {
             char nome[50];
-            lerInput(*nome, 50);
-            int indice = encontrarIndice(tarefas, ocupados, nome);
+            lerInput(nome, 50);
+            int indice = encontrarIndice(tarefas, ocupadas, nome);
             Tarefa tarefa = buscarTarefa(tarefas, indice);
 
             imprimirTarefa(tarefa);
             break;
         }
-        case 3:
+        case 3: //  3. Listar tarefas
         {
-            listarTarefas(tarefas, ocupados);
+            listarTarefas(tarefas, ocupadas);
             break;
         }
-        case 4:
+        case 4: // 4. Editar tarefa
         {
             char nome[50];
             lerInput(nome, 50);
-            int indice = encontrarIndice(tarefas, ocupados, nome);
+            int indice = encontrarIndice(tarefas, ocupadas, nome);
             if (indice == -1)
                 printf("Tente novamente");
             Tarefa tarefa = buscarTarefa(tarefas, indice);
 
-            editarTarefa(&tarefa);
+            editarTarefa(tarefas, indice);
             imprimirTarefa(tarefa);
             break;
         }
-        case 5:
+        case 5: // 5. Excluir tarefa
         {
-            char *nome[50];
-            lerInput(*nome, 50);
+            char nome[50];
+            lerInput(nome, 50);
 
-            int indice = encontrarIndice(tarefas, ocupados, &nome);
+            int indice = encontrarIndice(tarefas, ocupadas, nome);
 
-            excluirTarefa(tarefas, ocupados, indice);
+            excluirTarefa(tarefas, &ocupadas, indice);
             break;
         }
         default:
@@ -132,20 +137,18 @@ int main()
     return 0;
 }
 
-void lerInput(char *palavra[], int tamanho)
+void lerInput(char *palavra, int tamanho)
 {
     int i = 0;
-    char nome[tamanho];
 
     char c;
     while ((c = getchar()) != '\n' && (i < tamanho))
     {
-        nome[i] = c;
+        palavra[i] = c;
         i++;
     };
 
-    nome[i] = '\0';
-    *palavra = nome;
+    palavra[i] = '\0';
 }
 
 void exibirMenu(void)
@@ -173,27 +176,28 @@ Tarefa criarTarefa(void)
     printf("Descrica: ");
 
     lerInput(novaTarefa.descricao, sizeof(novaTarefa.descricao));
-    printf("Prioridade: ");
-    lerInput(novaTarefa.prioridade, sizeof(novaTarefa.prioridade));
+
+    printf("Prioridade (1-3): ");
+    scanf("%d", novaTarefa.prioridade);
 
     printf("Categoria");
     lerInput(novaTarefa.categoria, sizeof(novaTarefa.prioridade));
 
     return novaTarefa;
 }
-void inserirTarefa(Tarefa *tarefas[], int *ocupados, Tarefa novaTarefa)
+void inserirTarefa(Tarefa tarefas[], int *ocupados, int tamanho, Tarefa novaTarefa)
 {
     printf("Digite os campos da nova Tarefa");
 
-    if (ocupados == sizeof(tarefas))
+    if ((*ocupados) == tamanho)
     {
         printf("A Lista está cheia!. Delete um item para esvaziar");
         return;
     }
 
     // Aponta para o endereço da novaTarefa
-    tarefas[*ocupados++] = &novaTarefa;
-
+    tarefas[*ocupados] = novaTarefa;
+    (*ocupados)++;
     printf("Tarefa Inserida com sucesso");
 }
 
@@ -211,10 +215,10 @@ void listarTarefas(Tarefa tarefas[], int ocupadas)
     }
 }
 
-void editarTarefa(Tarefa *tarefa)
+void editarTarefa(Tarefa tarefas[], int indice)
 {
     int choice = 0;
-
+    Tarefa tarefa = tarefas[indice];
     printf("Qual campo deseja editar?");
     printf("1: Nome");
     printf("2: Descrição");
@@ -227,30 +231,32 @@ void editarTarefa(Tarefa *tarefa)
     {
     case 1:
         printf("Digite o novo nome: ");
-        lerInput(*tarefa->nome, sizeof(tarefa->nome));
+        lerInput(tarefa.nome, sizeof(tarefa.nome));
         break;
     case 2:
         printf("Digite a nova descrição: ");
-        lerInput(*tarefa->descricao, sizeof(tarefa->nome));
+        lerInput(tarefa.descricao, sizeof(tarefa.descricao));
         break;
     case 3:
         printf("Digite a nova data: ");
-        lerInput(*tarefa->data, sizeof(tarefa->data));
+        lerInput(tarefa.data, sizeof(tarefa.data));
         break;
     case 4:
         printf("Digite a nova categoria: ");
-        lerInput(*tarefa->categoria, sizeof(tarefa->categoria));
+        lerInput(tarefa.categoria, sizeof(tarefa.categoria));
         break;
     case 5:
         printf("Digite a nova prioridade: ");
-        scanf("%d", &tarefa->prioridade);
+        scanf("%d", &tarefa.prioridade);
     }
+
+    tarefas[indice] = tarefa;
 }
 
-void excluirTarefa(Tarefa tarefas[], int ocupadas, int indiceAlvo)
+void excluirTarefa(Tarefa tarefas[], int *ocupadas, int indiceAlvo)
 {
 
-    for (int i = 0; i < ocupadas; i++)
+    for (int i = 0; i < (*ocupadas); i++)
     {
         // Lembrete: para acessar campos de ponteiros, utilize flechas ao invés de '.'.
         tarefas[indiceAlvo].nome[0] = '\0';
@@ -268,6 +274,7 @@ void excluirTarefa(Tarefa tarefas[], int ocupadas, int indiceAlvo)
         tarefas[i + 1] = tarefas[i];
     };
 
+    (*ocupadas)--;
     printf("Lista reorganizada");
 }
 
@@ -281,7 +288,7 @@ void imprimirTarefa(Tarefa tarefa)
 }
 
 // Encontrar Índice facilita na coleta da tarefa; Além de despoluir o código
-int encontrarIndice(Tarefa tarefas[], int ocupadas, char nome)
+int encontrarIndice(Tarefa tarefas[], int ocupadas, char nome[])
 {
     for (int i = 0; i < ocupadas; i++)
     {
