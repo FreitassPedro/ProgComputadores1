@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+
 /* Trabalho Programação
 
 Utilize apenas conteúdos vistos na aula:
@@ -36,9 +39,6 @@ padrão em todas as funções.
 
 */
 
-#include <stdio.h>
-#include <string.h>
-
 #define MAX_SIZE 100;
 
 typedef struct // Diz ao Compilador como a estrutura Tarefa é
@@ -49,11 +49,6 @@ typedef struct // Diz ao Compilador como a estrutura Tarefa é
     char categoria[20];
     int prioridade;
 } Tarefa;
-
-struct end
-{
-
-} struc end Tarefa tarefas[MAX_SIZE]; // Inicializa elementos zerados
 
 void exibirMenu();
 
@@ -71,11 +66,10 @@ int main()
 {
 
     int tamanho = 50;
-    int utilizadas = 0;
+    int ocupados = 0;
     Tarefa tarefas[tamanho];
 
     int choice = 0;
-    char *nome[50];
 
     while (choice != 6)
     {
@@ -92,16 +86,27 @@ int main()
         case 2:
             char nome[50];
             lerInput(*nome, 50);
-            buscarTarefa();
+            Tarefa tarefa;
+            buscarTarefa(tarefas, tarefa, ocupados);
             break;
         case 3:
-            listarTarefas();
+            listarTarefas(tarefas, ocupados);
             break;
         case 4:
-            editarTarefa();
+            char nome;
+            lerInput(nome, 50);
+            int indice = encontrarIndice(tarefas, ocupados, nome);
+            Tarefa tarefa = buscarTarefa(tarefa, indice);
+            editarTarefa(*tarefas, *tarefa);
+            imprimirTarefa(tarefa);
             break;
         case 5:
-            excluirTarefa();
+            char nome[50];
+            lerInput(nome, 50);
+            int indice = encontrarIndice(tarefas, ocupados, nome);
+            Tarefa tarefa = buscarTarefa(tarefa, indice);
+
+            excluirTarefa(tarefas, tarefa);
             break;
         default:
             printf("Opção Inválida, digite novamente\n");
@@ -184,16 +189,8 @@ void inserirTarefa(Tarefa tarefas[], int *utilizadas, Tarefa novaTarefa)
 }
 
 // Recebe nome, procura tarefa.nome == nome, retorna tarefa
-void buscarTarefa(Tarefa tarefas[], Tarefa *tarefa, int ocupadas)
+void buscarTarefa(Tarefa tarefas, int indice)
 {
-    char *palavra;
-
-    lerInput(*palavra, 50);
-
-    Tarefa tarefa;
-
-    int indice = encontrarIndice(tarefas, ocupadas, palavra);
-
     if (indice == -1)
     {
         printf("Tarefa não encontrada ou não existe.");
@@ -201,6 +198,7 @@ void buscarTarefa(Tarefa tarefas[], Tarefa *tarefa, int ocupadas)
     }
     tarefa = &tarefas[indice];
 }
+
 void listarTarefas(Tarefa tarefas[], int ocupadas)
 {
     for (int i = 0; i < ocupadas; i++)
@@ -245,22 +243,12 @@ void editarTarefa(int *tarefas[], Tarefa tarefa)
     }
 }
 
-void excluirTarefa(int *tarefas[50], char nome)
+void excluirTarefa(int *tarefas[50], int indice)
 {
-    char nome;
-    printf("Nome da tarefa para excluir: ");
 
-    for (int i = 0; i < tamanho; i++)
-    {
-        if (tarefas[i].nome == nome)
-        {
-            Tarefa *tarefa = &tarefa[i];
-            tarefa.nome = "\0";
-            tarefa->descricao = "\0";
-            tarefa->data = "\0";
-            tarefa->prioridade = "\0";
-        }
-    }
+
+
+
 }
 
 void imprimirTarefa(Tarefa tarefa)
@@ -275,7 +263,6 @@ void imprimirTarefa(Tarefa tarefa)
 // Encontrar Índice facilita na coleta da tarefa; Além de despoluir o código
 int encontrarIndice(Tarefa tarefas[], int ocupadas, char nome)
 {
-
     for (int i = 0; i < ocupadas; i++)
     {
         if (str(tarefas[i], nome))
