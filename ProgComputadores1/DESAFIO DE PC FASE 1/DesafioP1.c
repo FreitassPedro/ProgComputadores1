@@ -39,8 +39,6 @@ padrão em todas as funções.
 
 */
 
-#define MAX_SIZE 100;
-
 typedef struct // Diz ao Compilador como a estrutura Tarefa é
 {
     char nome[50];
@@ -56,7 +54,7 @@ void inserirTarefa(Tarefa *tarefas[], int *ocupadas, Tarefa tarefa);
 Tarefa buscarTarefa(Tarefa tarefas[], int indice);
 void listarTarefas(Tarefa tarefas[], int ocupadas);
 void editarTarefa(Tarefa *tarefa);
-void excluirTarefa(Tarefa *tarefas[], int ocupadas, int indice);
+void excluirTarefa(Tarefa tarefas[], int ocupadas, int indice);
 
 void lerInput(char *palavra[], int tamanho);
 
@@ -249,17 +247,17 @@ void editarTarefa(Tarefa *tarefa)
     }
 }
 
-void excluirTarefa(Tarefa *tarefas[], int ocupadas, int indiceAlvo)
+void excluirTarefa(Tarefa tarefas[], int ocupadas, int indiceAlvo)
 {
 
     for (int i = 0; i < ocupadas; i++)
     {
         // Lembrete: para acessar campos de ponteiros, utilize flechas ao invés de '.'.
-        *tarefas[indiceAlvo]->nome = "\0";
-        *tarefas[indiceAlvo]->descricao = "\0";
-        *tarefas[indiceAlvo]->data = "\0";
-        *tarefas[indiceAlvo]->prioridade = 0;
-        *tarefas[indiceAlvo]->categoria = "\0";
+        tarefas[indiceAlvo].nome[0] = '\0';
+        tarefas[indiceAlvo].descricao[0] = '\0';
+        tarefas[indiceAlvo].data[0] = '\0';
+        tarefas[indiceAlvo].prioridade = 0;
+        tarefas[indiceAlvo].categoria[0] = '\0';
     };
 
     printf("Tarefa Excluida.");
