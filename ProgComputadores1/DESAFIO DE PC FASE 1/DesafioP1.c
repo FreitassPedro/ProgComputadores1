@@ -174,7 +174,7 @@ void exibirMenu(void)
 
 Tarefa criarTarefa(void)
 {
-    printf("Insira os dados para criar a Tarefa:  ");
+    printf("Insira os dados para criar a Tarefa\n:  ");
     Tarefa novaTarefa;
 
     printf("Nome: ");
@@ -187,10 +187,10 @@ Tarefa criarTarefa(void)
     lerInput(novaTarefa.data, sizeof(novaTarefa.data));
 
     printf("Prioridade (1-3): ");
-    scanf("%d", novaTarefa.prioridade);
+    scanf("%d", &novaTarefa.prioridade);
 
     printf("Categoria: ");
-    lerInput(novaTarefa.categoria, sizeof(novaTarefa.prioridade));
+    lerInput(novaTarefa.categoria, sizeof(novaTarefa.categoria));
 
     return novaTarefa;
 }
@@ -235,7 +235,8 @@ void editarTarefa(Tarefa tarefas[], int indice)
     printf("3: Data\n");
     printf("4: Categoria\n");
     printf("5: Prioridade\n");
-    scanf("%d\n", &choice);
+    scanf("%d", &choice);
+    getchar();
 
     switch (choice)
     {
@@ -256,8 +257,20 @@ void editarTarefa(Tarefa tarefas[], int indice)
         lerInput(tarefa.categoria, sizeof(tarefa.categoria));
         break;
     case 5:
-        printf("Digite a nova prioridade: ");
-        scanf("%d", &tarefa.prioridade);
+        int novaPrioridade = 0;
+        while (novaPrioridade < 1 || novaPrioridade > 3)
+        {
+            printf("Digite a nova prioridade (1, 2 ou 3): ");
+            scanf("%d", &tarefa.prioridade);
+            if (novaPrioridade < 1 || novaPrioridade > 3)
+            {
+                printf("Error... A prioridade deve ser 1, 2 ou 3.");
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     tarefas[indice] = tarefa;
@@ -266,22 +279,19 @@ void editarTarefa(Tarefa tarefas[], int indice)
 void excluirTarefa(Tarefa tarefas[], int *ocupadas, int indiceAlvo)
 {
 
-    for (int i = 0; i < (*ocupadas); i++)
-    {
-        // Lembrete: para acessar campos de ponteiros, utilize flechas ao invés de '.'.
-        tarefas[indiceAlvo].nome[0] = '\0';
-        tarefas[indiceAlvo].descricao[0] = '\0';
-        tarefas[indiceAlvo].data[0] = '\0';
-        tarefas[indiceAlvo].prioridade = 0;
-        tarefas[indiceAlvo].categoria[0] = '\0';
-    };
+    tarefas[indiceAlvo].nome[0] = '\0';
+    tarefas[indiceAlvo].descricao[0] = '\0';
+    tarefas[indiceAlvo].data[0] = '\0';
+    tarefas[indiceAlvo].prioridade = 0;
+    tarefas[indiceAlvo].categoria[0] = '\0';
 
     printf("Tarefa Excluida.\n");
 
     printf("Reorgaizando a lista...\n");
     for (int i = indiceAlvo; i < (*ocupadas); i++)
     {
-        tarefas[i + 1] = tarefas[i];
+        // Shifting
+        tarefas[i - 1] = tarefas[i];
     };
 
     (*ocupadas)--;
