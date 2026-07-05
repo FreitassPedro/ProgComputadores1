@@ -59,29 +59,38 @@ int main()
         {
             Celula *nova = criar_celula();
             inserir_tarefa(&listaTarefas, &nova);
-
+            break;
         } // 1. Inserir
-
         case 2:
         {
             char nome[50];
             input(&nome, sizeof(nome));
             Celula *cel;
-            cel = buscar(nome);
+            cel = buscar(&listaTarefas, nome);
+            break;
+
         } // 2. Buscar
         case 3:
         {
             listar(listaTarefas);
+            break;
+
         } // 3; Listar
         case 4:
         {
-            Celula *cel = buscar();
+            char nome[50];
+            input(&nome, sizeof(nome));
+            Celula *cel = buscar(&listaTarefas, nome);
             editar(&cel);
+            break;
+
         } // 4. Editar
         case 5:
         {
-            Celula *cel = buscar();
+            Celula *cel = buscar(&listaTarefas, nome);
             excluir(&listaTarefas, &cel);
+            break;
+
         } // 5. Excluir
         case 6:
         {
@@ -91,12 +100,13 @@ int main()
             cel = buscar(nome);
 
             concluir(&cel);
+            break;
+
         } // 6. Concluir
-        case 7: // Salvar
+        case 7: // Salvar Arquivo
         {
         }
-        case 8:
-            break;
+        break;
         }
     } while (escolha != 8);
     return 0;
@@ -225,7 +235,8 @@ void listar(ListaTarefas lista)
     atual = lista.cabeca;
     while (atual != NULL)
     {
-        imprimir_celula(&atual);
+        imprimir_celula(atual);
+        atual = atual->prox;
     }
 }
 
@@ -237,4 +248,47 @@ void imprimir_celula(Celula celula)
     printf(celula.categoria);
     printf(celula.prioridade);
     printf(celula.concluida);
+}
+
+void editar(Celula *cel)
+{
+
+    printf("Qual campo deseja editar?\n");
+    printf("1. Nome\n");
+    printf("2. Descricao\n");
+    printf("3. Data Limite\n ");
+    printf("4. Categoria\n");
+    printf("5. Prioridade\n");
+    printf("6. Concluir\n");
+
+    int escolha;
+    switch (escolha)
+    {
+    case 1:
+        printf("Novo nome:");
+        input(cel->nome, sizeof(cel->nome));
+        break;
+    case 2:
+        printf("Novo Descricao:");
+        input(cel->descricao, sizeof(cel->descricao));
+        break;
+    case 3:
+        printf("Data Limite:");
+        input(cel->data_limite, sizeof(cel->data_limite));
+        break;
+    case 4:
+        printf("Novo Categoria:");
+        input(cel->categoria, sizeof(cel->nome));
+        break;
+    case 5:
+        printf("Nova Prioridade");
+        scanf("%d", &cel->prioridade);
+        break;
+    case 6:
+        printf("Concluir?");
+        scanf("%d", &cel->concluida);
+        break;
+    default:
+        break;
+    }
 }
