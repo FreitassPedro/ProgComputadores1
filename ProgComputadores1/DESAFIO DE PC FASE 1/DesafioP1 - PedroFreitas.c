@@ -20,11 +20,11 @@ typedef struct
     int qttTarefas;
 } ListaTarefas;
 
-void imprimir();
-void inserir();
-void concluir();
-void buscar();
-void excluir();
+void imprimir(Celula celula);
+void inserir(ListaTarefas *listaTarefas);
+void concluir(Celula *celula);
+void buscar(ListaTarefas listaTarefas, char nome);
+void excluir(ListaTarefas listaTarefas);
 void salvar();
 
 void filtrar();
@@ -74,7 +74,6 @@ int main()
         {
             listar(listaTarefas);
             break;
-
         } // 3; Listar
         case 4:
         {
@@ -87,24 +86,31 @@ int main()
         } // 4. Editar
         case 5:
         {
+            char nome[50];
+            input(&nome, sizeof(nome));
             Celula *cel = buscar(&listaTarefas, nome);
             excluir(&listaTarefas, &cel);
             break;
-
         } // 5. Excluir
         case 6:
         {
             char nome[50];
             input(&nome, sizeof(nome));
-            Celula *cel;
-            cel = buscar(nome);
-
+            Celula *cel = buscar(&listaTarefas, nome);
             concluir(&cel);
             break;
 
         } // 6. Concluir
         case 7: // Salvar Arquivo
         {
+            FILE *fp;
+            fopen("tarefas_out.txt", "w");
+            Celula *cel;
+            while (cel->prox != NULL)
+            {
+                fprintf(fp, "%c|%c|%c|%c|%d|%d", cel->nome, cel->descricao, cel->data_limite, cel->categoria, cel->prioridade, cel->concluida);
+            }
+            fclose(fp);
         }
         break;
         }
@@ -202,7 +208,7 @@ Celula *buscar(ListaTarefas *lista, char nome)
 {
     Celula *atual;
 
-    while (strcomp(atual->nome, nome))
+    while (strcomp(atual->nome, nome) != 0)
     {
         atual = atual->prox;
     }
@@ -214,7 +220,7 @@ void input(char *palavra, int size)
 {
     char c;
     int contador;
-    while ((c = getchar != "\n") && (contador < size))
+    while ((c = getchar()) != '\n' && (contador < size))
     {
         palavra[contador] = c;
         contador++;
