@@ -57,16 +57,17 @@ int main()
         {
         case 1:
         {
-            Celula celula = criar_celula()
-                inserir_tarefa(&listaTarefas, &nova);
+            Celula *nova = criar_celula();
+            inserir_tarefa(&listaTarefas, &nova);
 
-        } // Inserir
+        } // 1. Inserir
 
         case 2:
         {
             char nome[50];
             input(&nome, sizeof(nome));
-            Celula cel = buscar(nome);
+            Celula *cel;
+            cel = buscar(nome);
         } // 2. Buscar
         case 3:
         {
@@ -84,7 +85,11 @@ int main()
         } // 5. Excluir
         case 6:
         {
-            Celula *cel = buscar();
+            char nome[50];
+            input(&nome, sizeof(nome));
+            Celula *cel;
+            cel = buscar(nome);
+
             concluir(&cel);
         } // 6. Concluir
         case 7: // Salvar
@@ -158,24 +163,32 @@ void remover_tarefa(ListaTarefas *lista, char nome)
     free(atual);
     lista->qttTarefas--;
 }
-Celula criar_celula()
+Celula *criar_celula()
 {
-    Celula novaTarefa;
+    Celula *novaTarefa = (Celula *)malloc(sizeof(Celula));
 
     printf("Nome: ");
-    input(novaTarefa.categoria, sizeof(novaTarefa.categoria));
+    input(novaTarefa->nome, sizeof(novaTarefa->nome));
 
     printf("Descricao: ");
-    printf("Data Limite: ");
-    printf("Categoria: ");
-    printf("Prioridade: ");
-    printf("Concluida: ");
+    input(novaTarefa->descricao, sizeof(novaTarefa->descricao));
 
-    novaTarefa.prox = NULL;
+    printf("Data Limite: ");
+    input(novaTarefa->data_limite, sizeof(novaTarefa->data_limite));
+
+    printf("Categoria: ");
+    input(novaTarefa->categoria, sizeof(novaTarefa->categoria));
+
+    printf("Prioridade: ");
+    scanf("%d", &novaTarefa->prioridade);
+    printf("Concluida: ");
+    novaTarefa->concluida = 0;
+
+    novaTarefa->prox = NULL;
     return novaTarefa;
 };
 
-Celula buscar(ListaTarefas *lista, char nome)
+Celula *buscar(ListaTarefas *lista, char nome)
 {
     Celula *atual;
 
@@ -212,7 +225,7 @@ void listar(ListaTarefas lista)
     atual = lista.cabeca;
     while (atual != NULL)
     {
-        imprimir_celula(atual);
+        imprimir_celula(&atual);
     }
 }
 
