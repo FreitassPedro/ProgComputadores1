@@ -1,0 +1,10 @@
+Desafio de PC|Resolver o desafio de PC e envie no email até a data estipulada|2026-07-12|Trabalho|3|0
+Fazer atividades de ACTG|Resolver e revisar as atividades passadas de ACTG|2038-01-09|Trabalho|1|0
+Estudar C|Praticar ponteiros structs e manipulacao de strings em C|2014-05-16|Prova|1|0
+Iniciar ULA|Comecar a implementacao e planejamento da ULA|2024-07-03|Trabalho|2|0
+Estudar Calculo I|Revisar limites derivadas e exercicios da disciplina|2026-03-04|Prova|1|0
+Revisar ACTG|Conferir respostas e corrigir questoes erradas de ACTG|2077-09-05|Trabalho|2|0
+Fazer exercicios de C|Implementar pequenos programas para praticar listas encadeads e inserção ordenada|2026-07-06|Trabalho|2|0
+Resolver lista de Calculo I|Fazer exercicios de derivadas e aplicacoes|2029-02-26|Trabalho|1|0
+Estudar para prova de C|Revisar conteudos e testar codigos no compilador|2026-11-30|Prova|1|0
+Organizar estudos da semana|Montar planejamento das tarefas e horarios de estudo|1995-04-10|Outra|3|0
