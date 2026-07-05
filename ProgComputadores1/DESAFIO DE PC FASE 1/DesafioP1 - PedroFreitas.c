@@ -49,28 +49,44 @@ int main()
     int escolha;
     do
     {
+        imprimir();
+        scanf("%d", &escolha);
+        getchar();
+
         switch (escolha)
         {
         case 1:
         {
-            inserir_tarefa();
+            Celula celula = criar_celula()
+                inserir_tarefa(&listaTarefas, &nova);
+
         } // Inserir
 
         case 2:
         {
-        } // Buscar
+            char nome[50];
+            input(&nome, sizeof(nome));
+            Celula cel = buscar(nome);
+        } // 2. Buscar
         case 3:
         {
-        } // Listar
+            listar(listaTarefas);
+        } // 3; Listar
         case 4:
         {
-        } // Editar
+            Celula *cel = buscar();
+            editar(&cel);
+        } // 4. Editar
         case 5:
         {
-        } // Concuir
+            Celula *cel = buscar();
+            excluir(&listaTarefas, &cel);
+        } // 5. Excluir
         case 6:
         {
-        }
+            Celula *cel = buscar();
+            concluir(&cel);
+        } // 6. Concluir
         case 7: // Salvar
         {
         }
@@ -159,6 +175,18 @@ Celula criar_celula()
     return novaTarefa;
 };
 
+Celula buscar(ListaTarefas *lista, char nome)
+{
+    Celula *atual;
+
+    while (strcomp(atual->nome, nome))
+    {
+        atual = atual->prox;
+    }
+
+    return atual;
+}
+
 void input(char *palavra, int size)
 {
     char c;
@@ -170,4 +198,30 @@ void input(char *palavra, int size)
     }
 
     palavra[contador] = "\n";
+}
+
+void concluir(Celula *celula)
+{
+    celula->concluida = 1;
+}
+
+void listar(ListaTarefas lista)
+{
+    Celula *atual;
+
+    atual = lista.cabeca;
+    while (atual != NULL)
+    {
+        imprimir_celula(atual);
+    }
+}
+
+void imprimir_celula(Celula celula)
+{
+    printf(celula.nome);
+    printf(celula.descricao);
+    printf(celula.data_limite);
+    printf(celula.categoria);
+    printf(celula.prioridade);
+    printf(celula.concluida);
 }
