@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Fusao Tarefa e Celula
 typedef struct cel
@@ -20,14 +21,21 @@ typedef struct
     int qttTarefas;
 } ListaTarefas;
 
-void imprimir(Celula celula);
-void inserir(ListaTarefas *listaTarefas);
+void imprimir_celula(Celula celula);
+void inserir_tarefa(ListaTarefas *lista, Celula *cel);
 void concluir(Celula *celula);
-void buscar(ListaTarefas listaTarefas, char nome);
-void excluir(ListaTarefas listaTarefas);
+Celula *buscar(ListaTarefas listaTarefas, char nome[]);
+void excluir(ListaTarefas *listaTarefas, char nome[]);
 void salvar();
+void editar(Celula *celula);
 
+void inicializar_lista(ListaTarefas *lista);
+Celula *criar_celula();
+void ler_input(char *palavra, int size);
+void imprimir_menu();
 void filtrar();
+
+void listar(ListaTarefas lista);
 /*
 Inserir: Solicitar ao usuário os campos necessários e armazenar os dados na lista encadeada de
 tarefas, ordenada pela data_limite.
@@ -40,6 +48,22 @@ e atualizar a lista encadeada.
 • Salvar tarefas: Salvar a lista encadeada de tarefas em um arquivo de texto, seguindo o formato
 especificado abaixo
 */
+
+/*
+Celula *nova -> inserir(&nova); Alterar proprio ponteiro
+Celula *nova ->
+
+char *palavra ou char palavra[] sãp a mesma coisa
+correto: lerInput(nome, sizeof(nome))
+
+
+//
+. Entendendo os Símbolos
+imprimir(Celula celula) -> imprmir(celula);
+atual: É o endereço de memória (o ponteiro).
+*atual: É o conteúdo dentro desse endereço (a estrutura Celula inteira).
+&atual: É o endereço do próprio ponteiro (raramente usado aqui).
+*/
 int main()
 {
 
@@ -49,7 +73,8 @@ int main()
     int escolha;
     do
     {
-        imprimir();
+        imprimir_menu();
+        printf("Escolha: ");
         scanf("%d", &escolha);
         getchar();
 
@@ -58,15 +83,15 @@ int main()
         case 1:
         {
             Celula *nova = criar_celula();
-            inserir_tarefa(&listaTarefas, &nova);
+            inserir_tarefa(&listaTarefas, nova);
             break;
         } // 1. Inserir
         case 2:
         {
             char nome[50];
-            input(&nome, sizeof(nome));
-            Celula *cel;
-            cel = buscar(&listaTarefas, nome);
+            ler_input(nome, sizeof(nome));
+            Celula *cel = buscar(listaTarefas, nome);
+            imprimir_celula(*cel);
             break;
 
         } // 2. Buscar
@@ -78,26 +103,26 @@ int main()
         case 4:
         {
             char nome[50];
-            input(&nome, sizeof(nome));
-            Celula *cel = buscar(&listaTarefas, nome);
-            editar(&cel);
+            ler_input(nome, 50);
+            Celula *cel = buscar(listaTarefas, nome);
+            editar(cel);
             break;
 
         } // 4. Editar
         case 5:
         {
             char nome[50];
-            input(&nome, sizeof(nome));
-            Celula *cel = buscar(&listaTarefas, nome);
-            excluir(&listaTarefas, &cel);
+            ler_input(nome, sizeof(nome));
+
+            excluir(&listaTarefas, nome);
             break;
         } // 5. Excluir
         case 6:
         {
             char nome[50];
-            input(&nome, sizeof(nome));
-            Celula *cel = buscar(&listaTarefas, nome);
-            concluir(&cel);
+            ler_input(nome, sizeof(nome));
+            Celula *cel = buscar(listaTarefas, nome);
+            concluir(cel);
             break;
 
         } // 6. Concluir
@@ -125,17 +150,17 @@ void inicializar_lista(ListaTarefas *lista)
     lista->qttTarefas = 0;
 }
 
-void imprimir()
+void imprimir_menu()
 {
-    printf("Qual operação deseja realizar?");
-    printf("1. Inserir tarefa");
-    printf("2. Buscar tarefa");
-    printf("3. Listar tarefas");
-    printf("4. Editar tarefa");
-    printf("5. Excluir tarefa");
-    printf("6. Marcar tarefa como concluida");
-    printf("7. Salvar lista");
-    printf("8. Sair do programa");
+    printf("\nQual operação deseja realizar?\n");
+    printf("1. Inserir tarefa\n");
+    printf("2. Buscar tarefa\n");
+    printf("3. Listar tarefas\n");
+    printf("4. Editar tarefa\n");
+    printf("5. Excluir tarefa\n");
+    printf("6. Marcar tarefa como concluida\n");
+    printf("7. Salvar lista\n");
+    printf("8. Sair do programa\n\n");
 }
 
 void inserir_tarefa(ListaTarefas *lista, Celula *nova)
@@ -143,11 +168,12 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
     if (nova == NULL)
         return;
 
-    Celula *nova = malloc(sizeof(Celula));
+    nova = (Celula *)malloc(sizeof(Celula));
     // If estrutura vazia, insira 1° elemento
     if (lista->cabeca == NULL)
     {
         lista->cabeca = nova;
+        nova->prox = NULL;
         return;
     }
 
@@ -164,7 +190,7 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
     lista->qttTarefas++;
 }
 
-void remover_tarefa(ListaTarefas *lista, char nome)
+void excluir(ListaTarefas *lista, char nome[])
 {
     Celula *atual, *anterior;
     atual = lista->cabeca;
@@ -184,16 +210,16 @@ Celula *criar_celula()
     Celula *novaTarefa = (Celula *)malloc(sizeof(Celula));
 
     printf("Nome: ");
-    input(novaTarefa->nome, sizeof(novaTarefa->nome));
+    ler_input(novaTarefa->nome, sizeof(novaTarefa->nome));
 
     printf("Descricao: ");
-    input(novaTarefa->descricao, sizeof(novaTarefa->descricao));
+    ler_input(novaTarefa->descricao, sizeof(novaTarefa->descricao));
 
     printf("Data Limite: ");
-    input(novaTarefa->data_limite, sizeof(novaTarefa->data_limite));
+    ler_input(novaTarefa->data_limite, sizeof(novaTarefa->data_limite));
 
     printf("Categoria: ");
-    input(novaTarefa->categoria, sizeof(novaTarefa->categoria));
+    ler_input(novaTarefa->categoria, sizeof(novaTarefa->categoria));
 
     printf("Prioridade: ");
     scanf("%d", &novaTarefa->prioridade);
@@ -204,11 +230,11 @@ Celula *criar_celula()
     return novaTarefa;
 };
 
-Celula *buscar(ListaTarefas *lista, char nome)
+Celula *buscar(ListaTarefas lista, char nome[])
 {
-    Celula *atual;
+    Celula *atual = lista.cabeca;
 
-    while (strcomp(atual->nome, nome) != 0)
+    while (strcmp(atual->nome, nome) != 0 && atual != NULL)
     {
         atual = atual->prox;
     }
@@ -216,17 +242,17 @@ Celula *buscar(ListaTarefas *lista, char nome)
     return atual;
 }
 
-void input(char *palavra, int size)
+void ler_input(char *palavra, int size)
 {
     char c;
-    int contador;
+    int contador = 0;
     while ((c = getchar()) != '\n' && (contador < size))
     {
         palavra[contador] = c;
         contador++;
     }
 
-    palavra[contador] = "\n";
+    palavra[contador] = '\0';
 }
 
 void concluir(Celula *celula)
@@ -241,19 +267,20 @@ void listar(ListaTarefas lista)
     atual = lista.cabeca;
     while (atual != NULL)
     {
-        imprimir_celula(atual);
+        // O '*' passa o
+        imprimir_celula(*atual);
         atual = atual->prox;
     }
 }
 
 void imprimir_celula(Celula celula)
 {
-    printf(celula.nome);
-    printf(celula.descricao);
-    printf(celula.data_limite);
-    printf(celula.categoria);
-    printf(celula.prioridade);
-    printf(celula.concluida);
+    printf("Nome: %s\n", celula.nome);
+    printf("Descricao %s\n", celula.descricao);
+    printf("Data Limite: %s\n", celula.data_limite);
+    printf("Categoria %s\n", celula.categoria);
+    printf("Prioridade %d\n", celula.prioridade);
+    printf("Concluida %d\n", celula.concluida);
 }
 
 void editar(Celula *cel)
@@ -272,19 +299,19 @@ void editar(Celula *cel)
     {
     case 1:
         printf("Novo nome:");
-        input(cel->nome, sizeof(cel->nome));
+        ler_input(cel->nome, sizeof(cel->nome));
         break;
     case 2:
         printf("Novo Descricao:");
-        input(cel->descricao, sizeof(cel->descricao));
+        ler_input(cel->descricao, sizeof(cel->descricao));
         break;
     case 3:
         printf("Data Limite:");
-        input(cel->data_limite, sizeof(cel->data_limite));
+        ler_input(cel->data_limite, sizeof(cel->data_limite));
         break;
     case 4:
         printf("Novo Categoria:");
-        input(cel->categoria, sizeof(cel->nome));
+        ler_input(cel->categoria, sizeof(cel->nome));
         break;
     case 5:
         printf("Nova Prioridade");
