@@ -1,298 +1,338 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-/*
-// Nome: Pedro da Silva Pereira de Freitas
-// matrícula: 26102678
-*/
-
-typedef struct // Diz ao Compilador como a estrutura Tarefa é
+// Fusao Tarefa e Celula
+typedef struct cel
 {
     char nome[50];
-    char descricao[100];
-    char data[10];
-    char categoria[20];
+    char descricao[50];
+    char data_limite[10];
+    char categoria[15];
     int prioridade;
-} Tarefa;
+    int concluida;
+    struct cel *prox;
+} Celula;
 
-void exibirMenu();
+typedef struct
+{
+    Celula *cabeca;
+    Celula *cauda;
+    int qttTarefas;
+} ListaTarefas;
 
-void inserirTarefa(Tarefa tarefas[], int *ocupadas, int tamanho, Tarefa novaTarefa);
-Tarefa buscarTarefa(Tarefa tarefas[], int indice);
-void listarTarefas(Tarefa tarefas[], int ocupadas);
-void editarTarefa(Tarefa tarefas[], int indice);
-void excluirTarefa(Tarefa tarefas[], int *ocupadas, int indice);
-Tarefa criarTarefa(void);
+void imprimir_celula(Celula celula);
+void inserir_tarefa(ListaTarefas *lista, Celula *cel);
+void concluir(Celula *celula);
+Celula *buscar(ListaTarefas listaTarefas, char nome[]);
+void excluir(ListaTarefas *listaTarefas, char nome[]);
+void salvar();
+void editar(Celula *celula);
 
-void lerInput(char *palavra, int tamanho);
-int encontrarIndice(Tarefa tarefas[], int tamanho, char nome[]);
+void inicializar_lista(ListaTarefas *lista);
+Celula *criar_celula();
+void ler_input(char *palavra, int size);
+void imprimir_menu();
+void filtrar();
 
-void imprimirTarefa(Tarefa tarefa);
+void listar(ListaTarefas lista);
+/*
+Inserir: Solicitar ao usuário os campos necessários e armazenar os dados na lista encadeada de
+tarefas, ordenada pela data_limite.
+• Concluir: Solicitar ao usuário o nome da tarefa e marcá-la como concluída.
+• Buscar: Buscar tarefa pelo nome e exibir seus dados completos.
+• Listar: Listar todas as tarefas de acordo com o filtro selecionado pelo usuário.
+• Editar: Buscar uma tarefa pelo nome, perguntar qual campo será editado, solicitar o novo valor
+e atualizar a lista encadeada.
+• Excluir: Excluir uma tarefa buscando pelo nome.
+• Salvar tarefas: Salvar a lista encadeada de tarefas em um arquivo de texto, seguindo o formato
+especificado abaixo
+*/
 
-/*Anotações
-- em C, passar listas em parametros na verdade é passar o ponteiro para primeiro elemento. Se quiser manipular uma cópia, teria que criar uma.
-- coleção de char ("Ex char nome[]") funciona como ponteiros. Utilizar *nome passa indice 0 do char, assim, *nome == nome[0].
+/*
+Celula *nova -> inserir(&nova); Alterar proprio ponteiro
+Celula *nova ->
+
+char *palavra ou char palavra[] sãp a mesma coisa
+correto: lerInput(nome, sizeof(nome))
+
+
+//
+. Entendendo os Símbolos
+imprimir(Celula celula) -> imprmir(celula);
+atual: É o endereço de memória (o ponteiro).
+*atual: É o conteúdo dentro desse endereço (a estrutura Celula inteira).
+&atual: É o endereço do próprio ponteiro (raramente usado aqui).
 */
 int main()
 {
 
-    int tamanho = 50;
-    int ocupadas = 0;
-    Tarefa tarefas[tamanho];
+    ListaTarefas listaTarefas;
+    inicializar_lista(&listaTarefas);
 
-    int choice = 0;
-
-    while (choice != 6)
+    int escolha;
+    do
     {
-        exibirMenu();
-
-        printf("Escolha:  ");
-        scanf("%d", &choice);
+        imprimir_menu();
+        printf("Escolha: ");
+        scanf("%d", &escolha);
         getchar();
 
-        switch (choice)
+        switch (escolha)
         {
-
-        case 1: // 1. Inserir Tarefa
+        case 1:
         {
-            Tarefa novaTarefa = criarTarefa();
-
-            inserirTarefa(tarefas, &ocupadas, tamanho, novaTarefa);
+            Celula *nova = criar_celula();
+            inserir_tarefa(&listaTarefas, nova);
             break;
-        }
-        case 2: // 2. Buscar tarefa
+        } // 1. Inserir
+        case 2:
         {
-            printf("Digite nome da Tarefa: \n");
             char nome[50];
+            ler_input(nome, sizeof(nome));
+            Celula *cel = buscar(listaTarefas, nome);
+            imprimir_celula(*cel);
+            break;
 
-            lerInput(nome, 50);
-            int indice = encontrarIndice(tarefas, ocupadas, nome);
-            if (indice == -1)
+        } // 2. Buscar
+        case 3:
+        {
+            listar(listaTarefas);
+            break;
+        } // 3; Listar
+        case 4:
+        {
+            char nome[50];
+            ler_input(nome, 50);
+            Celula *cel = buscar(listaTarefas, nome);
+            editar(cel);
+            break;
+
+        } // 4. Editar
+        case 5:
+        {
+            char nome[50];
+            ler_input(nome, sizeof(nome));
+
+            excluir(&listaTarefas, nome);
+            break;
+        } // 5. Excluir
+        case 6:
+        {
+            char nome[50];
+            ler_input(nome, sizeof(nome));
+            Celula *cel = buscar(listaTarefas, nome);
+            concluir(cel);
+            break;
+
+        } // 6. Concluir
+        case 7: // Salvar Arquivo
+        {
+            FILE *fp;
+            fp = fopen("tarefas_out.txt", "w");
+            if (fp == NULL)
             {
-                printf("Tarefa não encontrada.\n");
-                break;
+                printf("Falha ao abrir o arquivo.\n");
             }
-            printf("Tarefa encontrada.\n");
-            Tarefa tarefa = buscarTarefa(tarefas, indice);
-
-            imprimirTarefa(tarefa);
-            printf("\n");
-            break;
+            Celula *cel = listaTarefas.cabeca;
+            while (cel != NULL)
+            {
+                fprintf(fp, "%s|%s|%s|%s|%d|%d\n",
+                        cel->nome,
+                        cel->descricao,
+                        cel->data_limite,
+                        cel->categoria,
+                        cel->prioridade,
+                        cel->concluida);
+                cel = cel->prox;
+            }
+            fclose(fp);
         }
-        case 3: //  3. Listar tarefas
-        {
-            listarTarefas(tarefas, ocupadas);
-            break;
+        break;
         }
-        case 4: // 4. Editar tarefa
-        {
-            printf("Nome da tarefa para editar: ");
-            char nome[50];
-            lerInput(nome, 50);
-            int indice = encontrarIndice(tarefas, ocupadas, nome);
-            if (indice == -1)
-                printf("Tente novamente.\n");
-
-            editarTarefa(tarefas, indice);
-
-            Tarefa tarefa = buscarTarefa(tarefas, indice);
-            imprimirTarefa(tarefa);
-            break;
-        }
-        case 5: // 5. Excluir tarefa
-        {
-            printf("Nome da Tarefa para excluir: ");
-            char nome[50];
-            lerInput(nome, 50);
-
-            int indice = encontrarIndice(tarefas, ocupadas, nome);
-
-            excluirTarefa(tarefas, &ocupadas, indice);
-            break;
-        }
-        default:
-            printf("Opção Inválida, digite novamente\n");
-        }
-    }
-
+    } while (escolha != 8);
     return 0;
 }
 
-void lerInput(char *palavra, int tamanho)
+void inicializar_lista(ListaTarefas *lista)
 {
-    int i = 0;
-
-    char c;
-    while ((c = getchar()) != '\n' && (i < tamanho))
-    {
-        palavra[i] = c;
-        i++;
-    };
-
-    palavra[i] = '\0';
+    lista->cabeca = NULL;
+    lista->cauda = NULL;
+    lista->qttTarefas = 0;
 }
 
-void exibirMenu(void)
+void imprimir_menu()
 {
-    printf("\n ----- MENU ----- \n");
-    printf("Qual operação deseja realizar?\n");
+    printf("\nQual operação deseja realizar?\n");
     printf("1. Inserir tarefa\n");
     printf("2. Buscar tarefa\n");
     printf("3. Listar tarefas\n");
     printf("4. Editar tarefa\n");
     printf("5. Excluir tarefa\n");
-    printf("6. Sair do programa\n");
-    printf("\n");
+    printf("6. Marcar tarefa como concluida\n");
+    printf("7. Salvar lista\n");
+    printf("8. Sair do programa\n\n");
 }
 
-Tarefa criarTarefa(void)
+void inserir_tarefa(ListaTarefas *lista, Celula *nova)
 {
-    printf("Insira os dados para criar a Tarefa: \n ");
-    Tarefa novaTarefa;
+    if (nova == NULL)
+        return;
 
-    printf("Nome: ");
-    lerInput(novaTarefa.nome, sizeof(novaTarefa.nome));
-
-    printf("Descricao: ");
-    lerInput(novaTarefa.descricao, sizeof(novaTarefa.descricao));
-
-    printf("Data: ");
-    lerInput(novaTarefa.data, sizeof(novaTarefa.data));
-
-    printf("Categoria: ");
-    lerInput(novaTarefa.categoria, sizeof(novaTarefa.categoria));
-
-    int prioridade = 0;
-    do
+    // If estrutura vazia, insira 1° elemento
+    if (lista->cabeca == NULL)
     {
-        printf("Prioridade (1-3): ");
-        scanf("%d", &prioridade);
-        getchar();
-    } while (prioridade < 1 || prioridade > 3);
-    novaTarefa.prioridade = prioridade;
-
-    return novaTarefa;
-}
-void inserirTarefa(Tarefa tarefas[], int *ocupados, int tamanho, Tarefa novaTarefa)
-{
-    if ((*ocupados) == tamanho)
-    {
-        printf("A Lista está cheia!. Delete um item para esvaziar\n");
+        lista->cabeca = nova;
+        nova->prox = NULL;
         return;
     }
 
-    // Aponta para o endereço da novaTarefa
-    tarefas[*ocupados] = novaTarefa;
-    (*ocupados)++;
-    printf("Tarefa Inserida com sucesso.\n");
-}
-
-// Assume-se que o indice foi encontrado!
-Tarefa buscarTarefa(Tarefa tarefas[], int indice)
-{
-    return tarefas[indice];
-}
-
-void listarTarefas(Tarefa tarefas[], int ocupadas)
-{
-    printf("----Tarefas registradas --- \n\n");
-    for (int i = 0; i < ocupadas; i++)
+    // Se não, adicione intermedio ou na cauda
+    Celula *atual = lista->cabeca;
+    while ((atual->prox != NULL))
     {
-        imprimirTarefa(tarefas[i]);
+        atual = atual->prox;
+    }
+    atual->prox = nova;
+
+    if (nova->prox == NULL)
+        lista->cauda = nova;
+    lista->qttTarefas++;
+}
+
+void excluir(ListaTarefas *lista, char nome[])
+{
+    Celula *atual, *anterior;
+    atual = lista->cabeca;
+
+    while (atual != NULL && strcmp(atual->nome, nome) != 0)
+    {
+        anterior = atual;
+        atual = atual->prox;
     }
 
-    printf("----Tarefas registradas --- \n\n");
+    anterior->prox = atual->prox;
+    free(atual);
+    lista->qttTarefas--;
+}
+Celula *criar_celula()
+{
+    Celula *novaTarefa = (Celula *)malloc(sizeof(Celula));
+    printf("Digite informações da nova Tarefa.\n ");
+
+    printf("Nome: ");
+    ler_input(novaTarefa->nome, sizeof(novaTarefa->nome));
+
+    printf("Descricao: ");
+    ler_input(novaTarefa->descricao, sizeof(novaTarefa->descricao));
+
+    printf("Data Limite: ");
+    ler_input(novaTarefa->data_limite, sizeof(novaTarefa->data_limite));
+
+    printf("Categoria: ");
+    ler_input(novaTarefa->categoria, sizeof(novaTarefa->categoria));
+
+    printf("Prioridade: ");
+    scanf("%d", &novaTarefa->prioridade);
+
+    novaTarefa->concluida = 0;
+
+    novaTarefa->prox = NULL;
+    return novaTarefa;
+};
+
+Celula *buscar(ListaTarefas lista, char nome[])
+{
+    Celula *atual = lista.cabeca;
+
+    while (strcmp(atual->nome, nome) != 0 && atual != NULL)
+    {
+        atual = atual->prox;
+    }
+
+    return atual;
 }
 
-void editarTarefa(Tarefa tarefas[], int indice)
+void ler_input(char *palavra, int size)
 {
-    int choice = 0;
-    Tarefa tarefa = tarefas[indice];
-    printf("Qual campo deseja editar?\n");
-    printf("1: Nome\n");
-    printf("2: Descrição\n");
-    printf("3: Data\n");
-    printf("4: Categoria\n");
-    printf("5: Prioridade\n");
-    scanf("%d", &choice);
-    getchar();
+    char c;
+    int contador = 0;
+    while ((c = getchar()) != '\n' && (contador < size))
+    {
+        palavra[contador] = c;
+        contador++;
+    }
 
-    switch (choice)
+    palavra[contador] = '\0';
+}
+
+void concluir(Celula *celula)
+{
+    celula->concluida = 1;
+}
+
+void listar(ListaTarefas lista)
+{
+    Celula *atual;
+
+    atual = lista.cabeca;
+    while (atual != NULL)
+    {
+        // O '*' passa o conteudo do ponteiro
+        imprimir_celula(*atual);
+        atual = atual->prox;
+    }
+}
+
+void imprimir_celula(Celula celula)
+{
+    printf("Nome: %s\n", celula.nome);
+    printf("Descricao %s\n", celula.descricao);
+    printf("Data Limite: %s\n", celula.data_limite);
+    printf("Categoria %s\n", celula.categoria);
+    printf("Prioridade %d\n", celula.prioridade);
+    printf("Concluida %d\n", celula.concluida);
+}
+
+void editar(Celula *cel)
+{
+
+    printf("Qual campo deseja editar?\n");
+    printf("1. Nome\n");
+    printf("2. Descricao\n");
+    printf("3. Data Limite\n ");
+    printf("4. Categoria\n");
+    printf("5. Prioridade\n");
+    printf("6. Concluir\n");
+
+    int escolha;
+    switch (escolha)
     {
     case 1:
-        printf("Digite o novo nome: ");
-        lerInput(tarefa.nome, sizeof(tarefa.nome));
+        printf("Novo nome:");
+        ler_input(cel->nome, sizeof(cel->nome));
         break;
     case 2:
-        printf("Digite a nova descrição: ");
-        lerInput(tarefa.descricao, sizeof(tarefa.descricao));
+        printf("Novo Descricao:");
+        ler_input(cel->descricao, sizeof(cel->descricao));
         break;
     case 3:
-        printf("Digite a nova data: ");
-        lerInput(tarefa.data, sizeof(tarefa.data));
+        printf("Data Limite:");
+        ler_input(cel->data_limite, sizeof(cel->data_limite));
         break;
     case 4:
-        printf("Digite a nova categoria: ");
-        lerInput(tarefa.categoria, sizeof(tarefa.categoria));
+        printf("Novo Categoria:");
+        ler_input(cel->categoria, sizeof(cel->nome));
         break;
     case 5:
-
-        int prioridade = 0;
-        do
-        {
-            printf("Prioridade (1-3): ");
-            scanf("%d", &prioridade);
-            if (prioridade < 1 || prioridade > 3)
-                printf("Error... A prioridade deve ser 1, 2 ou 3.");
-
-            getchar();
-        } while (prioridade < 1 || prioridade > 3);
-        tarefa.prioridade = prioridade;
+        printf("Nova Prioridade");
+        scanf("%d", &cel->prioridade);
+        break;
+    case 6:
+        printf("Concluir?");
+        scanf("%d", &cel->concluida);
+        break;
+    default:
+        break;
     }
-
-    tarefas[indice] = tarefa;
 }
-
-void excluirTarefa(Tarefa tarefas[], int *ocupadas, int indiceAlvo)
-{
-
-    tarefas[indiceAlvo].nome[0] = '\0';
-    tarefas[indiceAlvo].descricao[0] = '\0';
-    tarefas[indiceAlvo].data[0] = '\0';
-    tarefas[indiceAlvo].prioridade = 0;
-    tarefas[indiceAlvo].categoria[0] = '\0';
-
-    printf("Tarefa Excluida.\n");
-
-    printf("Reorgnizando a lista...\n");
-    // Shifting
-
-    for (int i = indiceAlvo; i < (*ocupadas); i++)
-    {
-        tarefas[i] = tarefas[i + 1];
-    };
-
-    (*ocupadas)--;
-    printf("Lista reorganizada.\n");
-}
-
-void imprimirTarefa(Tarefa tarefa)
-{
-    printf("Nome: %s\n", tarefa.nome);
-    printf("Descrição: %s\n", tarefa.descricao);
-    printf("Data: %s\n", tarefa.data);
-    printf("Categoria: %s\n", tarefa.categoria);
-    printf("Prioridade: %d\n\n", tarefa.prioridade);
-}
-
-// Encontrar Índice facilita na coleta da tarefa; Além de despoluir o código
-int encontrarIndice(Tarefa tarefas[], int ocupadas, char nome[])
-{
-    for (int i = 0; i < ocupadas; i++)
-    {
-        // o Strcmp compara valores de String em C
-        if (strcmp(tarefas[i].nome, nome) == 0)
-            return i;
-    }
-    return -1;
-};
