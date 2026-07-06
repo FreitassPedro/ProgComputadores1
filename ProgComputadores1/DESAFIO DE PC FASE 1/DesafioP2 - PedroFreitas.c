@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ARQUIVO_SAIDA "C:\\Users\\jogui\\Documents\\Coding\\C\\ProgComputadores1\\DESAFIO DE PC FASE 1\\tarefas_out.txt"
+
 // Fusao Tarefa e Celula
 typedef struct cel
 {
@@ -129,7 +131,7 @@ int main()
         case 7: // Salvar Arquivo
         {
             FILE *fp;
-            fp = fopen("tarefas_out.txt", "w");
+            fp = fopen(ARQUIVO_SAIDA, "w");
             if (fp == NULL)
             {
                 printf("Falha ao abrir o arquivo.\n");
@@ -138,25 +140,34 @@ int main()
             Celula *cel = listaTarefas.cabeca;
 
             printf("Salvando lista no txt...\n");
-            fprintf(fp, "Testando\n");
+            if (fprintf(fp, "Testando\n") < 0)
+            {
+                printf("Falha ao escrever no arquivo.\n");
+                fclose(fp);
+                break;
+            }
             while (cel != NULL)
             {
                 imprimir_celula(*cel);
-                fprintf(fp, "%s|%s|%s|%s|%d|%d\n",
-                        cel->nome,
-                        cel->descricao,
-                        cel->data_limite,
-                        cel->categoria,
-                        cel->prioridade,
-                        cel->concluida);
+                if (fprintf(fp, "%s|%s|%s|%s|%d|%d\n",
+                            cel->nome,
+                            cel->descricao,
+                            cel->data_limite,
+                            cel->categoria,
+                            cel->prioridade,
+                            cel->concluida) < 0)
+                {
+                    printf("Falha ao escrever uma tarefa no arquivo.\n");
+                    fclose(fp);
+                    break;
+                }
                 printf("Tarefa impressa\n");
                 cel = cel->prox;
             }
-            fflush(fp);
             fclose(fp);
             printf("Arquivo Fechando\n");
+            break;
         }
-        break;
         }
     } while (escolha != 8);
     return 0;
