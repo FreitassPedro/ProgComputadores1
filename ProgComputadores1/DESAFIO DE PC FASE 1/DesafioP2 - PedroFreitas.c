@@ -133,10 +133,15 @@ int main()
             if (fp == NULL)
             {
                 printf("Falha ao abrir o arquivo.\n");
+                break;
             }
             Celula *cel = listaTarefas.cabeca;
+
+            printf("Salvando lista no txt...\n");
+            fprintf(fp, "Testando\n");
             while (cel != NULL)
             {
+                imprimir_celula(*cel);
                 fprintf(fp, "%s|%s|%s|%s|%d|%d\n",
                         cel->nome,
                         cel->descricao,
@@ -144,9 +149,12 @@ int main()
                         cel->categoria,
                         cel->prioridade,
                         cel->concluida);
+                printf("Tarefa impressa\n");
                 cel = cel->prox;
             }
+            fflush(fp);
             fclose(fp);
+            printf("Arquivo Fechando\n");
         }
         break;
         }
@@ -184,6 +192,7 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
     {
         lista->cabeca = nova;
         nova->prox = NULL;
+        lista->qttTarefas = 1;
         return;
     }
 
@@ -276,6 +285,8 @@ void listar(ListaTarefas lista)
     Celula *atual;
 
     atual = lista.cabeca;
+    printf("\n----Listando Tarefas---\n");
+
     while (atual != NULL)
     {
         // O '*' passa o conteudo do ponteiro
