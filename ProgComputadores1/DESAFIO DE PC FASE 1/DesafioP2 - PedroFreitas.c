@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define ARQUIVO_SAIDA "C:\\Users\\jogui\\Documents\\Coding\\C\\ProgComputadores1\\DESAFIO DE PC FASE 1\\tarefas_out.txt"
+#define ARQUIVO_ENTRADA "C:\\Users\\jogui\\Documents\\Coding\\C\\ProgComputadores1\\DESAFIO DE PC FASE 1\\tarefas_in.txt"
 
 // Fusao Tarefa e Celula
 typedef struct cel
@@ -38,6 +39,7 @@ void imprimir_menu();
 void filtrar();
 
 void listar(ListaTarefas lista);
+void salvar_lista(ListaTarefas lista);
 /*
 Inserir: Solicitar ao usuário os campos necessários e armazenar os dados na lista encadeada de
 tarefas, ordenada pela data_limite.
@@ -149,20 +151,7 @@ int main()
             while (cel != NULL)
             {
                 imprimir_celula(*cel);
-                if (fprintf(fp, "%s|%s|%s|%s|%d|%d\n",
-                            cel->nome,
-                            cel->descricao,
-                            cel->data_limite,
-                            cel->categoria,
-                            cel->prioridade,
-                            cel->concluida) < 0)
-                {
-                    printf("Falha ao escrever uma tarefa no arquivo.\n");
-                    fclose(fp);
-                    break;
-                }
-                printf("Tarefa impressa\n");
-                cel = cel->prox;
+                salvar_lista(listaTarefas);
             }
             fclose(fp);
             printf("Arquivo Fechando\n");
@@ -178,6 +167,50 @@ void inicializar_lista(ListaTarefas *lista)
     lista->cabeca = NULL;
     lista->cauda = NULL;
     lista->qttTarefas = 0;
+
+    FILE *fp;
+    fp = fopen(ARQUIVO_ENTRADA, "r");
+    if (fp == NULL)
+    {
+        printf("Erro ao abrir o arquivo de entrada\n");
+        return;
+    }
+
+    char linha[300];
+    while (fgets(linha, sizeof(linha), fp))
+    {
+        Celula *celulaAtual = (Celula *)malloc(sizeof(Celula));
+        if (celulaAtual == NULL)
+        {
+            printf("Erro de memoria ao carregar tarefas\n");
+            fclose(fp);
+            return;
+        }
+
+        strcpy(celulaAtual->nome, strtok(linha, "|"));
+        strcpy(celulaAtual->descricao, strtok(NULL, "|"));
+        strcpy(celulaAtual->data_limite, strtok(NULL, "|"));
+        strcpy(celulaAtual->categoria, strtok(NULL, "|"));
+        // 'Atoi' ASCII TO INTEGER converte string para Int
+        celulaAtual->prioridade = atoi(strtok(NULL, "|"));
+        celulaAtual->concluida = atoi(strtok(NULL, "|\n"));
+        celulaAtual->prox = NULL;
+
+        if (lista->cabeca == NULL)
+        {
+            lista->cabeca = celulaAtual;
+        }
+        else
+        {
+            lista->cauda->prox = celulaAtual;
+        }
+
+        lista->cauda = celulaAtual;
+
+        lista->qttTarefas++;
+    }
+
+    fclose(fp);
 }
 
 void imprimir_menu()
@@ -265,7 +298,7 @@ Celula *buscar(ListaTarefas lista, char nome[])
 {
     Celula *atual = lista.cabeca;
 
-    while (strcmp(atual->nome, nome) != 0 && atual != NULL)
+    while (atual != NULL && strcmp(atual->nome, nome) != 0)
     {
         atual = atual->prox;
     }
@@ -357,4 +390,31 @@ void editar(Celula *cel)
     default:
         break;
     }
+}
+
+void salvar_lista(ListaTarefas lista)
+{
+    Celula *cel = lista.cabeca;
+
+    FILE *fp = fopen(ARQUIVO_SAIDA, "w");
+    while (cel != NULL)
+    {
+        if (fprintf(fp, "%s|%s|%s|%s|%d|%d\n",
+                    cel->nome,
+                    cel->descricao,
+                    cel->data_limite,
+                    cel->categoria,
+                    cel->prioridade,
+                    cel->concluida) < 0)
+        {
+            printf("Erro ao salvar.");
+            fclose(fp);
+            break;
+        }
+
+        cel = cel->prox;
+    }
+
+    fclose(fp);
+    printf("Salvo.\n");
 }
