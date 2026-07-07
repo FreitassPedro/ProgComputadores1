@@ -132,29 +132,8 @@ int main()
         } // 6. Concluir
         case 7: // Salvar Arquivo
         {
-            FILE *fp;
-            fp = fopen(ARQUIVO_SAIDA, "w");
-            if (fp == NULL)
-            {
-                printf("Falha ao abrir o arquivo.\n");
-                break;
-            }
-            Celula *cel = listaTarefas.cabeca;
 
-            printf("Salvando lista no txt...\n");
-            if (fprintf(fp, "Testando\n") < 0)
-            {
-                printf("Falha ao escrever no arquivo.\n");
-                fclose(fp);
-                break;
-            }
-            while (cel != NULL)
-            {
-                imprimir_celula(*cel);
-                salvar_lista(listaTarefas);
-            }
-            fclose(fp);
-            printf("Arquivo Fechando\n");
+            salvar_lista(listaTarefas);
             break;
         }
         }
@@ -333,20 +312,25 @@ void listar(ListaTarefas lista)
 
     while (atual != NULL)
     {
+
         // O '*' passa o conteudo do ponteiro
         imprimir_celula(*atual);
         atual = atual->prox;
     }
+
+    printf("\n----Tarefas Listadas----\n");
 }
 
 void imprimir_celula(Celula celula)
 {
+    printf("\n");
     printf("Nome: %s\n", celula.nome);
     printf("Descricao %s\n", celula.descricao);
     printf("Data Limite: %s\n", celula.data_limite);
     printf("Categoria %s\n", celula.categoria);
     printf("Prioridade %d\n", celula.prioridade);
     printf("Concluida %d\n", celula.concluida);
+    printf("\n");
 }
 
 void editar(Celula *cel)
