@@ -3,7 +3,11 @@
 #include <string.h>
 
 #define ARQUIVO_SAIDA "C:\\Users\\jogui\\Documents\\Coding\\C\\ProgComputadores1\\DESAFIO DE PC FASE 1\\tarefas_out.txt"
+<<<<<<< HEAD
 #define ARQUIVO_ENTRADA "C:\\Users\\jogui\\Documents\\Coding\\C\\ProgComputadores1\\DESAFIO DE PC FASE 1\\tarefas_in.txt"
+=======
+#define ARQUIVO_ENTRADA "C:\\Users\\jogui\\Documents\\Coding\\C\\ProgComputadores1\\DESAFIO DE PC FASE 1\\tarefas_out.txt"
+>>>>>>> 2ed7bc185cf6b40a56ee4854de83eb731050b096
 
 // Fusao Tarefa e Celula
 typedef struct cel
@@ -169,6 +173,7 @@ void inicializar_lista(ListaTarefas *lista)
     lista->qttTarefas = 0;
 
     FILE *fp;
+<<<<<<< HEAD
     fp = fopen(ARQUIVO_ENTRADA, "r");
     if (fp == NULL)
     {
@@ -186,6 +191,15 @@ void inicializar_lista(ListaTarefas *lista)
             fclose(fp);
             return;
         }
+=======
+    fopen(ARQUIVO_ENTRADA, "r");
+
+    char linha[300];
+    Celula *celulaAtual = (Celula *)malloc(sizeof(Celula));
+    Celula *celulaAnterior = (Celula *)malloc(sizeof(Celula));
+    while (fgets(linha, sizeof(linha), fp))
+    {
+>>>>>>> 2ed7bc185cf6b40a56ee4854de83eb731050b096
 
         strcpy(celulaAtual->nome, strtok(linha, "|"));
         strcpy(celulaAtual->descricao, strtok(NULL, "|"));
@@ -194,7 +208,10 @@ void inicializar_lista(ListaTarefas *lista)
         // 'Atoi' ASCII TO INTEGER converte string para Int
         celulaAtual->prioridade = atoi(strtok(NULL, "|"));
         celulaAtual->concluida = atoi(strtok(NULL, "|\n"));
+<<<<<<< HEAD
         celulaAtual->prox = NULL;
+=======
+>>>>>>> 2ed7bc185cf6b40a56ee4854de83eb731050b096
 
         if (lista->cabeca == NULL)
         {
@@ -202,6 +219,7 @@ void inicializar_lista(ListaTarefas *lista)
         }
         else
         {
+<<<<<<< HEAD
             lista->cauda->prox = celulaAtual;
         }
 
@@ -211,6 +229,19 @@ void inicializar_lista(ListaTarefas *lista)
     }
 
     fclose(fp);
+=======
+            celulaAnterior->prox = celulaAtual;
+            lista->cauda = celulaAtual;
+        }
+
+        lista->qttTarefas++;
+    }
+
+    free(celulaAnterior);
+    free(celulaAnterior);
+
+    salvar_lista(*lista);
+>>>>>>> 2ed7bc185cf6b40a56ee4854de83eb731050b096
 }
 
 void imprimir_menu()
