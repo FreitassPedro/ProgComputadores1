@@ -221,14 +221,33 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
 
     // Se não, adicione intermedio ou na cauda
     Celula *atual = lista->cabeca;
-    while ((atual->prox != NULL))
+    Celula *anterior = lista->cabeca;
+    while ((atual != NULL))
     {
+
+        char dataAtual[6];
+        // strcmp == 0 string iguais
+        // < 0: a primeira vem antes da segunda
+        // > 0: a primeira vem DEPOIS da segunda
+        if (strcmp(atual->data_limite, nova->data_limite) > 0)
+        {
+            anterior->prox = nova;
+            nova->prox = atual;
+            break;
+        }
+        anterior = atual;
         atual = atual->prox;
     }
-    atual->prox = nova;
 
+    // SE durante o Loop o nova não foi adicionado no meio, adicione-a como cauda
     if (nova->prox == NULL)
+    {
+        atual->prox = nova;
         lista->cauda = nova;
+    }
+    free(atual);
+    free(anterior);
+
     lista->qttTarefas++;
 }
 
@@ -245,6 +264,7 @@ void excluir(ListaTarefas *lista, char nome[])
 
     anterior->prox = atual->prox;
     free(atual);
+    free(anterior);
     lista->qttTarefas--;
 }
 Celula *criar_celula()
