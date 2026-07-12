@@ -101,9 +101,15 @@ int main()
         } // 1. Inserir
         case 2:
         {
+            printf("Digite nome da tarefa pra buscar: ");
             char nome[50];
             ler_input(nome, sizeof(nome));
             Celula *cel = buscar(listaTarefas, nome);
+            if (cel == NULL)
+            {
+                printf("Tarefa nao encontrada\n");
+                break;
+            }
             imprimir_celula(*cel);
             break;
 
@@ -123,10 +129,15 @@ int main()
         } // 3; Listar
         case 4:
         {
+            printf("Nome tarefa pra editar: ");
+
             char nome[50];
             ler_input(nome, 50);
             Celula *cel = buscar(listaTarefas, nome);
-            editar(cel);
+            if (cel != NULL)
+                editar(cel);
+            else
+                printf("Não encontrada.\n");
             break;
 
         } // 4. Editar
@@ -147,7 +158,10 @@ int main()
             char nome[50];
             ler_input(nome, sizeof(nome));
             Celula *cel = buscar(listaTarefas, nome);
-            concluir(cel);
+            if (cel != NULL)
+                concluir(cel);
+            else
+                printf("Digite tarefa existente\n");
             break;
 
         } // 6. Concluir
@@ -353,6 +367,7 @@ void excluir(ListaTarefas *lista, char nome[])
 {
     if (lista->cabeca == NULL)
     {
+        printf("ERRO: Tarefa não existe. \n");
         return;
     }
 
@@ -380,7 +395,11 @@ void excluir(ListaTarefas *lista, char nome[])
     }
 
     if (atual == NULL)
+    {
+        printf("ERRO: Tarefa não existe. \n");
+
         return; // encerra se não encontrar
+    }
     else
     {
         if (atual->prox == NULL)
@@ -421,12 +440,14 @@ Celula *buscar(ListaTarefas lista, char nome[])
 {
     Celula *atual = lista.cabeca;
 
-    while (atual != NULL && strcmp(atual->nome, nome) != 0)
+    while (atual != NULL)
     {
+        if (strcmp(atual->nome, nome) == 0)
+            return atual;
         atual = atual->prox;
     }
-
-    return atual;
+    printf("Tarefa não encontrada: %s\n", nome);
+    return NULL;
 }
 
 void ler_input(char *palavra, int size)
@@ -515,7 +536,7 @@ void editar(Celula *cel)
         ler_input(cel->descricao, sizeof(cel->descricao));
         break;
     case 3:
-        printf("Data Limite:");
+        printf("Nova Data Limite:");
         ler_input(cel->data_limite, sizeof(cel->data_limite));
         break;
     case 4:
