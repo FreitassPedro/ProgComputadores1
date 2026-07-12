@@ -244,11 +244,15 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
         // strcmp == 0 string iguais
         // < 0: a primeira vem antes da segunda
         // > 0: a primeira vem DEPOIS da segunda
-        if (strcmp(atual->data_limite, nova->data_limite) > 0)
+        if (strcmp(atual->data_limite, nova->data_limite) >= 0)
         {
+            // Se a data for igual mas priodidade atual é maior que a nova, insiere depois
+            if (strcmp(atual->data_limite, nova->data_limite) == 0 && (atual->prioridade > nova->prioridade)) {
+                nova->prox = atual->prox;
+                atual->prox = nova;
+            }
             anterior->prox = nova;
             nova->prox = atual;
-            break;
         }
         anterior = atual;
         atual = atual->prox;
@@ -339,7 +343,7 @@ void concluir(Celula *celula)
 void listar(ListaTarefas lista)
 {
     Celula *atual = lista.cabeca;
-    
+
     printf("\n----Listando Tarefas---\n");
     while (atual != NULL)
     {
