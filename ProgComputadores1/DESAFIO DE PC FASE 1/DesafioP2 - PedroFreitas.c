@@ -9,9 +9,9 @@
 typedef struct cel
 {
     char nome[50];
-    char descricao[50];
-    char data_limite[10];
-    char categoria[15];
+    char descricao[100];
+    char data_limite[11];
+    char categoria[20];
     int prioridade;
     int concluida;
     struct cel *prox;
@@ -165,24 +165,39 @@ void inicializar_lista(ListaTarefas *lista)
             fclose(fp);
             return;
         }
+        char *nome;
+        char *descricao;
+        char *data;
+        char *categoria;
+        char *prioridade;
+        char *concluida;
 
-        strcpy(celulaAtual->nome, strtok(linha, "|"));
-        strcpy(celulaAtual->descricao, strtok(NULL, "|"));
-        strcpy(celulaAtual->data_limite, strtok(NULL, "|"));
-        strcpy(celulaAtual->categoria, strtok(NULL, "|"));
-        // 'Atoi' ASCII TO INTEGER converte string para Int
-        celulaAtual->prioridade = atoi(strtok(NULL, "|"));
-        celulaAtual->concluida = atoi(strtok(NULL, "|\n"));
+        nome = strtok(linha, "|");
+        descricao = strtok(NULL, "|");
+        data = strtok(NULL, "|");
+        categoria = strtok(NULL, "|");
+        prioridade = strtok(NULL, "|");
+        concluida = strtok(NULL, "|\n");
+
+        printf("Nome: %s\n", nome);
+        printf("Descricao: %s\n", descricao);
+        printf("Data: %s\n", data);
+        printf("Categoria: %s\n", categoria);
+        printf("Prioridade: %s\n", prioridade);
+        printf("Concluida: %s\n\n", concluida);
+
+        strcpy(celulaAtual->nome, nome);
+        strcpy(celulaAtual->descricao, descricao);
+        strcpy(celulaAtual->data_limite, data);
+        strcpy(celulaAtual->categoria, categoria);
+        celulaAtual->prioridade = atoi(prioridade);
+        celulaAtual->concluida = atoi(concluida);
         celulaAtual->prox = NULL;
 
         if (lista->cabeca == NULL)
-        {
             lista->cabeca = celulaAtual;
-        }
         else
-        {
             lista->cauda->prox = celulaAtual;
-        }
 
         lista->cauda = celulaAtual;
 
@@ -239,14 +254,12 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
         atual = atual->prox;
     }
 
-    // SE durante o Loop o nova não foi adicionado no meio, adicione-a como cauda
+    // Se durante o loop a nova nao foi adicionada no meio, adicione-a como cauda
     if (nova->prox == NULL)
     {
         atual->prox = nova;
         lista->cauda = nova;
     }
-    free(atual);
-    free(anterior);
 
     lista->qttTarefas++;
 }
@@ -325,14 +338,11 @@ void concluir(Celula *celula)
 
 void listar(ListaTarefas lista)
 {
-    Celula *atual;
-
-    atual = lista.cabeca;
+    Celula *atual = lista.cabeca;
+    
     printf("\n----Listando Tarefas---\n");
-
     while (atual != NULL)
     {
-
         // O '*' passa o conteudo do ponteiro
         imprimir_celula(*atual);
         atual = atual->prox;
@@ -345,11 +355,11 @@ void imprimir_celula(Celula celula)
 {
     printf("\n");
     printf("Nome: %s\n", celula.nome);
-    printf("Descricao %s\n", celula.descricao);
+    printf("Descricao: %s\n", celula.descricao);
     printf("Data Limite: %s\n", celula.data_limite);
-    printf("Categoria %s\n", celula.categoria);
-    printf("Prioridade %d\n", celula.prioridade);
-    printf("Concluida %d\n", celula.concluida);
+    printf("Categoria: %s\n", celula.categoria);
+    printf("Prioridade: %d\n", celula.prioridade);
+    printf("Concluida: %d\n", celula.concluida);
     printf("\n");
 }
 
@@ -381,7 +391,7 @@ void editar(Celula *cel)
         break;
     case 4:
         printf("Novo Categoria:");
-        ler_input(cel->categoria, sizeof(cel->nome));
+        ler_input(cel->categoria, sizeof(cel->categoria));
         break;
     case 5:
         printf("Nova Prioridade");
