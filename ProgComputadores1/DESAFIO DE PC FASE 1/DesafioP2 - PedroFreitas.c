@@ -259,7 +259,7 @@ void inicializar_lista(ListaTarefas *lista)
                 atual = atual->prox;
             }
         }
-        
+
     } while (trocou == 1); // Se houve troca, o algoritmo reitera até acabar as trocas.
 
     lista->cauda = lista->cabeca; // Garante que elemento único seja cabeça também
@@ -334,26 +334,43 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
 
 void excluir(ListaTarefas *lista, char nome[])
 {
-    Celula *atual = lista->cabeca;
-    Celula *tmp = atual->prox;
-
-    if (tmp == NULL)
-        tmp = atual;
-
-    while (atual != NULL)
+    if (lista->cabeca == NULL)
     {
-        if (tmp != NULL && strcmp(tmp->nome, nome) == 0)
-        {
-            atual->prox = tmp->prox;
-            break;
-        }
-
-        atual = atual->prox;
-        tmp = atual->prox;
+        return;
     }
 
-    free(tmp);
+    Celula *atual = lista->cabeca;
+    Celula *anterior = NULL;
 
+    // Verifica primeiro se o primeiro elemento é a cabeça, e define a cauda
+    if (strcmp(atual->nome, nome) == 0)
+    {
+        lista->cabeca = lista->cabeca->prox;
+
+        if (lista->cabeca == NULL)
+        {
+            lista->cauda == NULL;
+        }
+
+        free(atual);
+        lista->qttTarefas--;
+        return;
+    }
+    while (atual != NULL && strcmp(atual->nome, nome) != 0)
+    {
+        anterior = atual;
+        atual = atual->prox;
+    }
+
+    if (atual == NULL)
+        return 0; // encerra se não encontrar
+    else
+    {
+        if (atual->prox == NULL)
+            lista->cauda = anterior;
+        anterior->prox = atual->prox;
+    }
+    free(atual);
     lista->qttTarefas--;
 }
 Celula *criar_celula()
