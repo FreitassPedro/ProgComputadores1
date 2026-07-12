@@ -223,6 +223,48 @@ void inicializar_lista(ListaTarefas *lista)
     }
 
     fclose(fp);
+
+    // Reordenar lista
+    if (lista->cabeca == NULL || lista->cabeca->prox == NULL)
+        return;
+
+    int trocou;
+    do
+    {
+        trocou = 0;
+        Celula *anterior = NULL;
+        Celula *atual = lista->cabeca;
+
+        while (atual != NULL && atual->prox != NULL)
+        {
+            Celula *proximo = atual->prox;
+
+            // Se a data de atual for maior que a do proximo, troca os nos
+            if (strcmp(atual->data_limite, proximo->data_limite) > 0)
+            {
+                atual->prox = proximo->prox;
+                proximo->prox = atual;
+
+                if (anterior == NULL)
+                    lista->cabeca = proximo;
+                else
+                    anterior->prox = proximo;
+
+                anterior = proximo;
+                trocou = 1;
+            }
+            else
+            {
+                anterior = atual;
+                atual = atual->prox;
+            }
+        }
+        
+    } while (trocou == 1); // Se houve troca, o algoritmo reitera até acabar as trocas.
+
+    lista->cauda = lista->cabeca; // Garante que elemento único seja cabeça também
+    while (lista->cauda->prox != NULL)
+        lista->cauda = lista->cauda->prox;
 }
 
 void imprimir_menu()
@@ -255,10 +297,9 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
     // Se não, adicione intermedio ou na cauda
     Celula *atual = lista->cabeca;
     Celula *anterior = lista->cabeca;
-    while ((atual != NULL))
+    while (atual != NULL)
     {
 
-        char dataAtual[6];
         // strcmp == 0 string iguais
         // < 0: a primeira vem antes da segunda
         // > 0: a primeira vem DEPOIS da segunda
@@ -270,8 +311,12 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
                 nova->prox = atual->prox;
                 atual->prox = nova;
             }
-            anterior->prox = nova;
-            nova->prox = atual;
+            else
+            {
+                anterior->prox = nova;
+                nova->prox = atual;
+            }
+            break;
         }
         anterior = atual;
         atual = atual->prox;
@@ -289,24 +334,32 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
 
 void excluir(ListaTarefas *lista, char nome[])
 {
-    Celula *atual, *anterior;
-    atual = lista->cabeca;
+    Celula *atual = lista->cabeca;
+    Celula *tmp = atual->prox;
 
-    while (atual != NULL && strcmp(atual->nome, nome) != 0)
+    if (tmp == NULL)
+        tmp = atual;
+
+    while (atual != NULL)
     {
-        anterior = atual;
+        if (tmp != NULL && strcmp(tmp->nome, nome) == 0)
+        {
+            atual->prox = tmp->prox;
+            break;
+        }
+
         atual = atual->prox;
+        tmp = atual->prox;
     }
 
-    anterior->prox = atual->prox;
-    free(atual);
-    free(anterior);
+    free(tmp);
+
     lista->qttTarefas--;
 }
 Celula *criar_celula()
 {
     Celula *novaTarefa = (Celula *)malloc(sizeof(Celula));
-    printf("Digite informações da nova Tarefa.\n ");
+    printf("Digite informações da nova Tarefa.\n");
 
     printf("Nome: ");
     ler_input(novaTarefa->nome, sizeof(novaTarefa->nome));
@@ -314,7 +367,7 @@ Celula *criar_celula()
     printf("Descricao: ");
     ler_input(novaTarefa->descricao, sizeof(novaTarefa->descricao));
 
-    printf("Data Limite: ");
+    printf("Data Limite (AAAA-MM-DD): ");
     ler_input(novaTarefa->data_limite, sizeof(novaTarefa->data_limite));
 
     printf("Categoria: ");
@@ -394,7 +447,7 @@ void listar(ListaTarefas lista, int filtro)
 
 void imprimir_celula(Celula celula)
 {
-    printf("\n");3
+    printf("\n");
     printf("Nome: %s\n", celula.nome);
     printf("Descricao: %s\n", celula.descricao);
     printf("Data Limite: %s\n", celula.data_limite);
