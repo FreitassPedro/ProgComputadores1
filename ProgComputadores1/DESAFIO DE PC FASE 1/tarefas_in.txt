@@ -7,4 +7,4 @@ Revisar ACTG|Conferir respostas e corrigir questoes erradas de ACTG|2077-09-05|T
 Fazer exercicios de C|Implementar pequenos programas para praticar listas encadeads e inserção ordenada|2026-07-06|Trabalho|2|0
 Resolver lista de Calculo I|Fazer exercicios de derivadas e aplicacoes|2029-02-26|Trabalho|1|0
 Estudar para prova de C|Revisar conteudos e testar codigos no compilador|2026-11-30|Prova|1|0
-Organizar estudos da semana|Montar planejamento das tarefas e horarios de estudo|1995-04-10|Outra|3|0
+Organizar estudos da semana|Montar planejamento das tarefas e horarios de estudo|1995-04-10|Outra|3|1

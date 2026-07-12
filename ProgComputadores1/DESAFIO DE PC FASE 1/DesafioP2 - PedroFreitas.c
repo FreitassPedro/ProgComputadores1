@@ -38,7 +38,7 @@ void ler_input(char *palavra, int size);
 void imprimir_menu();
 void filtrar();
 
-void listar(ListaTarefas lista);
+void listar(ListaTarefas lista, int filtro);
 void salvar_lista(ListaTarefas lista);
 /*
 Inserir: Solicitar ao usuário os campos necessários e armazenar os dados na lista encadeada de
@@ -60,6 +60,16 @@ Celula *nova ->
 char *palavra ou char palavra[] sãp a mesma coisa
 correto: lerInput(nome, sizeof(nome))
 
+funcaoA(Objeto *obj);
+funcaoB(Objeto obj);
+
+Obejeto *ptr_para_obj = malloc(...);
+Obejeto obj;
+funcaoA(ptr_para_obj);
+funcaoA(&obj);
+
+funcaoB(*ptr_para_obj);
+funcaoB(obj);
 
 //
 . Entendendo os Símbolos
@@ -101,7 +111,15 @@ int main()
         } // 2. Buscar
         case 3:
         {
-            listar(listaTarefas);
+            int filtro = 0;
+            printf("Filtrar por: \n");
+            printf("1. Todas as Tarefas: \n");
+            printf("2. Apenas concluidas: \n");
+            printf("3. Apenas nao concluidas: \n");
+            printf("Escolha: ");
+            scanf("%d", &filtro);
+
+            listar(listaTarefas, filtro);
             break;
         } // 3; Listar
         case 4:
@@ -247,7 +265,8 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
         if (strcmp(atual->data_limite, nova->data_limite) >= 0)
         {
             // Se a data for igual mas priodidade atual é maior que a nova, insiere depois
-            if (strcmp(atual->data_limite, nova->data_limite) == 0 && (atual->prioridade > nova->prioridade)) {
+            if (strcmp(atual->data_limite, nova->data_limite) == 0 && (atual->prioridade > nova->prioridade))
+            {
                 nova->prox = atual->prox;
                 atual->prox = nova;
             }
@@ -340,15 +359,33 @@ void concluir(Celula *celula)
     celula->concluida = 1;
 }
 
-void listar(ListaTarefas lista)
+void listar(ListaTarefas lista, int filtro)
 {
     Celula *atual = lista.cabeca;
 
     printf("\n----Listando Tarefas---\n");
     while (atual != NULL)
     {
+        int imprimir = 0;
         // O '*' passa o conteudo do ponteiro
-        imprimir_celula(*atual);
+        switch (filtro)
+        {
+        case 1:
+            imprimir = 1;
+            break;
+        case 2:
+            if (atual->concluida == 1)
+                imprimir = 1;
+            break;
+        case 3:
+            if (atual->concluida == 0)
+                imprimir = 1;
+            break;
+        default:
+            break;
+        }
+        if (imprimir == 1)
+            imprimir_celula(*atual);
         atual = atual->prox;
     }
 
@@ -357,7 +394,7 @@ void listar(ListaTarefas lista)
 
 void imprimir_celula(Celula celula)
 {
-    printf("\n");
+    printf("\n");3
     printf("Nome: %s\n", celula.nome);
     printf("Descricao: %s\n", celula.descricao);
     printf("Data Limite: %s\n", celula.data_limite);
