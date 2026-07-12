@@ -36,7 +36,6 @@ void inicializar_lista(ListaTarefas *lista);
 Celula *criar_celula();
 void ler_input(char *palavra, int size);
 void imprimir_menu();
-void filtrar();
 
 void listar(ListaTarefas lista, int filtro);
 void salvar_lista(ListaTarefas lista);
@@ -133,6 +132,8 @@ int main()
         } // 4. Editar
         case 5:
         {
+            printf("Nome tarefa pra excluir: ");
+
             char nome[50];
             ler_input(nome, sizeof(nome));
 
@@ -141,6 +142,8 @@ int main()
         } // 5. Excluir
         case 6:
         {
+            printf("Nome tarefa pra concluir: ");
+
             char nome[50];
             ler_input(nome, sizeof(nome));
             Celula *cel = buscar(listaTarefas, nome);
@@ -150,7 +153,6 @@ int main()
         } // 6. Concluir
         case 7: // Salvar Arquivo
         {
-
             salvar_lista(listaTarefas);
             break;
         }
@@ -296,7 +298,22 @@ void inserir_tarefa(ListaTarefas *lista, Celula *nova)
 
     // Se não, adicione intermedio ou na cauda
     Celula *atual = lista->cabeca;
-    Celula *anterior = lista->cabeca;
+    Celula *anterior = NULL;
+
+    // Identifica se o novo é menor que a cabeça
+    if (strcmp(atual->nome, nova->nome) > 0)
+    {
+        nova->prox = lista->cabeca;
+        lista->cabeca = nova;
+        free(atual);
+        return;
+    }
+    else
+    {
+        anterior = atual;
+        atual = atual->prox;
+    }
+
     while (atual != NULL)
     {
 
@@ -351,9 +368,9 @@ void excluir(ListaTarefas *lista, char nome[])
         {
             lista->cauda == NULL;
         }
-
         free(atual);
         lista->qttTarefas--;
+        printf("Tarefa excluida.\n");
         return;
     }
     while (atual != NULL && strcmp(atual->nome, nome) != 0)
@@ -363,7 +380,7 @@ void excluir(ListaTarefas *lista, char nome[])
     }
 
     if (atual == NULL)
-        return 0; // encerra se não encontrar
+        return; // encerra se não encontrar
     else
     {
         if (atual->prox == NULL)
@@ -372,6 +389,7 @@ void excluir(ListaTarefas *lista, char nome[])
     }
     free(atual);
     lista->qttTarefas--;
+    printf("Tarefa excluida.\n");
 }
 Celula *criar_celula()
 {
