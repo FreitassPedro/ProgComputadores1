@@ -424,11 +424,27 @@ Celula *criar_celula()
     printf("Data Limite (AAAA-MM-DD): ");
     ler_input(novaTarefa->data_limite, sizeof(novaTarefa->data_limite));
 
-    printf("Categoria: ");
-    ler_input(novaTarefa->categoria, sizeof(novaTarefa->categoria));
+    int invalidInput = 1;
+    do
+    {
+        printf("Categoria (Prova, Trabalho ou Outra): ");
+        ler_input(novaTarefa->categoria, sizeof(novaTarefa->categoria));
+        if (strcmp(novaTarefa->categoria, "Trabalho") != 0 && strcmp(novaTarefa->categoria, "Prova") != 0 && strcmp(novaTarefa->categoria, "Outra") != 0)
+        {
+            printf("Categoria inválida. Escolha Prova, Trabalho ou Outra.\n");
+        }
+        else
+            invalidInput = 0;
+    } while (invalidInput != 0);
 
-    printf("Prioridade: ");
-    scanf("%d", &novaTarefa->prioridade);
+    invalidInput = 1;
+    do
+    {
+        printf("Prioridade (1, 2 ou 3): ");
+        scanf("%d", &novaTarefa->prioridade);
+        if (novaTarefa->prioridade >= 1 && novaTarefa->prioridade <= 3)
+            invalidInput = 0;
+    } while (invalidInput != 0);
 
     novaTarefa->concluida = 0;
 
