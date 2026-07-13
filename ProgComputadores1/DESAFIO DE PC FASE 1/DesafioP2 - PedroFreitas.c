@@ -1,9 +1,24 @@
+// Nome: Pedro da Silva Pereira de Freitas
+// matricula: 26102678
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/*
+###### IMPORTANTE ###### IMPORTANTE  ###### IMPORTANTE  ###### IMPORTANTE
+
+
+Embora o desafio não permita o uso de variáveis globais, tive que especificar o PATH completo no meu PC que não estava acessando os arquivos FILE.
 #define ARQUIVO_SAIDA "C:\\Users\\jogui\\Documents\\Coding\\C\\ProgComputadores1\\DESAFIO DE PC FASE 1\\tarefas_out.txt"
 #define ARQUIVO_ENTRADA "C:\\Users\\jogui\\Documents\\Coding\\C\\ProgComputadores1\\DESAFIO DE PC FASE 1\\tarefas_in.txt"
+
+
+Se o avaliador conseguir da forma que deveria ser correta, mantive a indicação.
+###### IMPORTANTE  ###### IMPORTANTE  ###### IMPORTANTE  ###### IMPORTANTE
+*/
+#define ARQUIVO_SAIDA "tarefas_out.txt"
+#define ARQUIVO_ENTRADA "tarefas_in.txt"
 
 // Fusao Tarefa e Celula
 typedef struct cel
@@ -53,6 +68,7 @@ especificado abaixo
 */
 
 /*
+## COMENTARIOS E ANOTAÇÔES ##
 Celula *nova -> inserir(&nova); Alterar proprio ponteiro
 Celula *nova ->
 
@@ -71,7 +87,7 @@ funcaoB(*ptr_para_obj);
 funcaoB(obj);
 
 //
-. Entendendo os Símbolos
+Entendendo os Símbolos
 imprimir(Celula celula) -> imprmir(celula);
 atual: É o endereço de memória (o ponteiro).
 *atual: É o conteúdo dentro desse endereço (a estrutura Celula inteira).
