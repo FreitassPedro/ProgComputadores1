@@ -39,11 +39,11 @@ int main()
         sscanf(linha, "%c", &letra);
         // Se 1 sim, se nao 0
         int isVogal = 0;
-        Letra *lt = (Letra *)malloc(sizeof(Letra));
+        Letra *novaLetra = (Letra *)malloc(sizeof(Letra));
 
-        lt->letra = letra;
-        lt->prox = NULL;
-        
+        novaLetra->letra = letra;
+        novaLetra->prox = NULL;
+
         for (int i = 0; i < sizeof(vogaisArray); i++)
         {
             if (letra == vogaisArray[i])
@@ -62,7 +62,7 @@ int main()
         Letra *atual = aux->cabeca;
         if (atual == NULL)
         {
-            aux->cabeca = atual;
+            aux->cabeca = novaLetra;
         }
         else
         {
@@ -70,7 +70,7 @@ int main()
             {
                 atual = atual->prox;
             }
-            atual->prox = lt;
+            atual->prox = novaLetra;
         }
     }
     fclose(fp);
@@ -99,18 +99,29 @@ int main()
 
     Letra *aux = vogais->cabeca;
     int listasImpressas = 0;
+    int titulo = 0;
+
     while (aux != NULL)
     {
-        if (listasImpressas == 0)
+        if (titulo == 0)
         {
-            fprintf(fp, "Vogais: ");
+            titulo = 1;
+            if (listasImpressas == 0)
+            {
+                fprintf(fp, "Vogais:\n");
+            }
+            else
+                fprintf(fp, "Consoantes:\n");
         }
-        fprintf(fpSaida, "%c", aux->letra);
 
-        if (aux->prox == NULL && listasImpressas == 1)
+        fprintf(fpSaida, "%c\n", aux->letra);
+
+        if (aux->prox == NULL && listasImpressas == 0)
         {
-            fprintf(fp, "Consoantes: ");
+            titulo = 0;
+            aux = consoantes->cabeca;
             listasImpressas++;
+            continue;
         }
         aux = aux->prox;
     }
