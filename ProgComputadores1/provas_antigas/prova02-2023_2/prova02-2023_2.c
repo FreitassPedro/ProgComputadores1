@@ -13,6 +13,8 @@ typedef struct lista
     struct letra *cabeca;
 } Lista;
 
+void bubbleSort(Lista *lista);
+
 int main()
 {
     FILE *fp = fopen("entrada.txt", "r");
@@ -26,8 +28,11 @@ int main()
     Lista *vogais = (Lista *)malloc(sizeof(Lista));
     Lista *consoantes = (Lista *)malloc(sizeof(Lista));
 
-    vogais->cabeca = NULL;
-    consoantes->cabeca = NULL;
+    vogais->cabeca = (Letra *)malloc(sizeof(Letra));
+    consoantes->cabeca = (Letra *)malloc(sizeof(Letra));
+
+    vogais->cabeca->prox = NULL;
+    consoantes->cabeca->prox = NULL;
 
     char vogaisArray[5] = {'A', 'E', 'I', 'O', 'U'};
 
@@ -60,35 +65,21 @@ int main()
             aux = consoantes;
 
         Letra *atual = aux->cabeca;
-        if (atual == NULL)
+
+        // EM ASCII, o 'a' < 'b' < 'c'
+        while (atual->prox != NULL && novaLetra->letra > atual->prox->letra)
         {
-            aux->cabeca = novaLetra;
+            atual = atual->prox;
         }
-        else
-        {
-            while (atual->prox != NULL)
-            {
-                atual = atual->prox;
-            }
-            atual->prox = novaLetra;
-        }
+        novaLetra->prox = atual->prox;
+        atual->prox = novaLetra;
     }
     fclose(fp);
 
     // Reordenar listas
-    /*
-    Lista *auxiliar = vogais;
-    Letra *atualOrd = auxiliar->cabeca;
-    Letra *nula = NULL;
+    //  bubbleSort(vogais);
+    // bubbleSort(consoantes);
 
-    while ()
-    while (atualOrd != NULL)
-    {
-        Letra *nula = NULL;
-
-        atualOrd = atualOrd->prox;
-    }
-*/
     // Funcao de salvar
     FILE *fpSaida = fopen("saida.txt", "w");
     if (fpSaida == NULL)
@@ -97,7 +88,7 @@ int main()
         return 1;
     }
 
-    Letra *aux = vogais->cabeca;
+    Letra *aux = vogais->cabeca->prox;
     int listasImpressas = 0;
     int titulo = 0;
 
@@ -108,10 +99,10 @@ int main()
             titulo = 1;
             if (listasImpressas == 0)
             {
-                fprintf(fp, "Vogais:\n");
+                fprintf(fpSaida, "Vogais:\n");
             }
             else
-                fprintf(fp, "Consoantes:\n");
+                fprintf(fpSaida, "Consoantes:\n");
         }
 
         fprintf(fpSaida, "%c\n", aux->letra);
@@ -128,4 +119,51 @@ int main()
 
     fclose(fpSaida);
     return 0;
+}
+
+void bubbleSort(Lista *lista)
+{
+    if (lista == NULL || lista->cabeca == NULL)
+        return;
+
+    int trocou;
+
+    do
+    {
+        trocou = 0;
+        Letra *anterior = NULL;
+        Letra *atual = lista->cabeca;
+
+        while (atual != NULL && atual->prox != NULL)
+        {
+            Letra *prox = atual->prox;
+
+            if (atual->letra > prox->letra)
+            {
+                /* swap atual and prox */
+                if (anterior == NULL)
+                {
+                    lista->cabeca = prox;
+                }
+                else
+                {
+                    anterior->prox = prox;
+                }
+
+                atual->prox = prox->prox;
+                prox->prox = atual;
+
+                trocou = 1;
+
+                /* after swap, 'prox' is before 'atual' */
+                anterior = prox;
+            }
+            else
+            {
+                anterior = atual;
+                atual = atual->prox;
+            }
+        }
+
+    } while (trocou);
 }
